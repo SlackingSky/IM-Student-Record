@@ -41,6 +41,7 @@
             btnDelete = new Button();
             btnUpdate = new Button();
             btnRefresh = new Button();
+            label1 = new Label();
             ((System.ComponentModel.ISupportInitialize)dgvStudents).BeginInit();
             SuspendLayout();
             // 
@@ -150,11 +151,21 @@
             btnRefresh.UseVisualStyleBackColor = true;
             btnRefresh.Click += btnRefresh_Click;
             // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(138, 30);
+            label1.Name = "label1";
+            label1.Size = new Size(62, 15);
+            label1.TabIndex = 14;
+            label1.Text = "Student ID";
+            // 
             // frmStudentRec
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1172, 649);
+            Controls.Add(label1);
             Controls.Add(btnRefresh);
             Controls.Add(btnUpdate);
             Controls.Add(btnDelete);
@@ -190,5 +201,6 @@
         private Button btnDelete;
         private Button btnUpdate;
         private Button btnRefresh;
+        private Label label1;
     }
 }
