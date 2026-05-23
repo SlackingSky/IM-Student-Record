@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmStudentRec));
             DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmStudentRec));
             txtStudentID = new TextBox();
             cmbCourse = new TextBox();
             txtFullName = new TextBox();
@@ -40,7 +40,6 @@
             dtpDOB = new DateTimePicker();
             txtEmail = new TextBox();
             txtPhone = new TextBox();
-            dgvStudents = new DataGridView();
             btnAdd = new Button();
             imageList1 = new ImageList(components);
             btnDelete = new Button();
@@ -53,7 +52,6 @@
             pictureBox1 = new PictureBox();
             label3 = new Label();
             groupBox1 = new GroupBox();
-            groupBox2 = new GroupBox();
             groupBox3 = new GroupBox();
             label7 = new Label();
             label8 = new Label();
@@ -62,12 +60,14 @@
             label6 = new Label();
             label5 = new Label();
             label4 = new Label();
-            ((System.ComponentModel.ISupportInitialize)dgvStudents).BeginInit();
+            dgvStudents = new DataGridView();
+            groupBox2 = new GroupBox();
             panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             groupBox1.SuspendLayout();
-            groupBox2.SuspendLayout();
             groupBox3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvStudents).BeginInit();
+            groupBox2.SuspendLayout();
             SuspendLayout();
             // 
             // txtStudentID
@@ -143,36 +143,6 @@
             txtPhone.Name = "txtPhone";
             txtPhone.Size = new Size(258, 27);
             txtPhone.TabIndex = 8;
-            // 
-            // dgvStudents
-            // 
-            dgvStudents.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            dgvStudents.BackgroundColor = Color.Cyan;
-            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = SystemColors.Control;
-            dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            dataGridViewCellStyle1.ForeColor = Color.Black;
-            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
-            dgvStudents.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-            dgvStudents.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = SystemColors.Window;
-            dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            dataGridViewCellStyle2.ForeColor = Color.Black;
-            dataGridViewCellStyle2.SelectionBackColor = Color.RoyalBlue;
-            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.False;
-            dgvStudents.DefaultCellStyle = dataGridViewCellStyle2;
-            dgvStudents.Location = new Point(29, 31);
-            dgvStudents.Margin = new Padding(3, 4, 3, 4);
-            dgvStudents.Name = "dgvStudents";
-            dgvStudents.ReadOnly = true;
-            dgvStudents.RowHeadersWidth = 51;
-            dgvStudents.Size = new Size(1219, 381);
-            dgvStudents.TabIndex = 9;
-            dgvStudents.CellContentClick += dgvStudents_CellContentClick;
             // 
             // btnAdd
             // 
@@ -331,19 +301,6 @@
             groupBox1.TabStop = false;
             groupBox1.Text = "System Functions";
             // 
-            // groupBox2
-            // 
-            groupBox2.BackColor = Color.LightCyan;
-            groupBox2.Controls.Add(dgvStudents);
-            groupBox2.Font = new Font("Rockwell", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            groupBox2.ForeColor = Color.DarkBlue;
-            groupBox2.Location = new Point(34, 405);
-            groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(1274, 434);
-            groupBox2.TabIndex = 20;
-            groupBox2.TabStop = false;
-            groupBox2.Text = "Student Records";
-            // 
             // groupBox3
             // 
             groupBox3.BackColor = Color.LightCyan;
@@ -443,28 +400,69 @@
             label4.TabIndex = 15;
             label4.Text = "Full Name:";
             // 
+            // dgvStudents
+            // 
+            dgvStudents.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvStudents.BackgroundColor = Color.Cyan;
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = SystemColors.Control;
+            dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            dataGridViewCellStyle1.ForeColor = Color.Black;
+            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
+            dgvStudents.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dgvStudents.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = SystemColors.Window;
+            dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            dataGridViewCellStyle2.ForeColor = Color.Black;
+            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.False;
+            dgvStudents.DefaultCellStyle = dataGridViewCellStyle2;
+            dgvStudents.Location = new Point(47, 44);
+            dgvStudents.Margin = new Padding(3, 4, 3, 4);
+            dgvStudents.Name = "dgvStudents";
+            dgvStudents.ReadOnly = true;
+            dgvStudents.RowHeadersWidth = 51;
+            dgvStudents.Size = new Size(1178, 341);
+            dgvStudents.TabIndex = 9;
+            dgvStudents.CellContentClick += dgvStudents_CellContentClick;
+            // 
+            // groupBox2
+            // 
+            groupBox2.Controls.Add(dgvStudents);
+            groupBox2.Font = new Font("Rockwell", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            groupBox2.Location = new Point(35, 420);
+            groupBox2.Name = "groupBox2";
+            groupBox2.Size = new Size(1273, 418);
+            groupBox2.TabIndex = 21;
+            groupBox2.TabStop = false;
+            groupBox2.Text = "Student Records";
+            // 
             // frmStudentRec
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.LightCyan;
             ClientSize = new Size(1339, 865);
+            Controls.Add(groupBox2);
             Controls.Add(groupBox3);
             Controls.Add(groupBox1);
             Controls.Add(panel1);
             Controls.Add(panel3);
-            Controls.Add(groupBox2);
             Margin = new Padding(3, 4, 3, 4);
             Name = "frmStudentRec";
             Text = "Student Record System";
-            ((System.ComponentModel.ISupportInitialize)dgvStudents).EndInit();
             panel3.ResumeLayout(false);
             panel3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             groupBox1.ResumeLayout(false);
-            groupBox2.ResumeLayout(false);
             groupBox3.ResumeLayout(false);
             groupBox3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvStudents).EndInit();
+            groupBox2.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -478,7 +476,6 @@
         private DateTimePicker dtpDOB;
         private TextBox txtEmail;
         private TextBox txtPhone;
-        private DataGridView dgvStudents;
         private Button btnAdd;
         private Button btnDelete;
         private Button btnUpdate;
@@ -490,7 +487,6 @@
         private Label label3;
         private ImageList imageList1;
         private GroupBox groupBox1;
-        private GroupBox groupBox2;
         private GroupBox groupBox3;
         private Label label5;
         private Label label4;
@@ -500,5 +496,7 @@
         private Label label10;
         private Label label6;
         private PictureBox pictureBox1;
+        private DataGridView dgvStudents;
+        private GroupBox groupBox2;
     }
 }

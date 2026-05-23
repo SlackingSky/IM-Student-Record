@@ -37,7 +37,7 @@ namespace IM_Student_Record
             }
         }
 
-
+        
         private void btnAdd_Click(object sender, EventArgs e)
         {
             // Validates empty fields
