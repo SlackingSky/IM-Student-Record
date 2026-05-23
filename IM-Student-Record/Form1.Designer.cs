@@ -82,6 +82,7 @@
             // 
             // cmbCourse
             // 
+            cmbCourse.AutoCompleteCustomSource.AddRange(new string[] { "BSA", "BSCpE", "BSEntrep", "BSHM", "BSIT", "BSEDEN", "BSEDMT", "DOMTLOM" });
             cmbCourse.Font = new Font("Segoe UI", 9F);
             cmbCourse.Location = new Point(199, 147);
             cmbCourse.Margin = new Padding(3, 4, 3, 4);
@@ -100,6 +101,7 @@
             // 
             // cmbGender
             // 
+            cmbGender.AutoCompleteCustomSource.AddRange(new string[] { "Male", "Female", "Non-binary", "Prefer not to say" });
             cmbGender.Font = new Font("Segoe UI", 9F);
             cmbGender.Location = new Point(634, 105);
             cmbGender.Margin = new Padding(3, 4, 3, 4);
@@ -109,6 +111,7 @@
             // 
             // cmbYear
             // 
+            cmbYear.AutoCompleteCustomSource.AddRange(new string[] { "1", "2", "3", "4" });
             cmbYear.Font = new Font("Segoe UI", 9F);
             cmbYear.Location = new Point(199, 191);
             cmbYear.Margin = new Padding(3, 4, 3, 4);
