@@ -33,14 +33,9 @@
             DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
-            txtStudentID = new TextBox();
-            cmbCourse = new TextBox();
             txtFullName = new TextBox();
-            cmbGender = new TextBox();
-            cmbYear = new TextBox();
             dtpDOB = new DateTimePicker();
             txtEmail = new TextBox();
-            txtPhone = new TextBox();
             btnAdd = new Button();
             imageList1 = new ImageList(components);
             btnDelete = new Button();
@@ -54,6 +49,11 @@
             label3 = new Label();
             groupBox1 = new GroupBox();
             groupBox3 = new GroupBox();
+            txtStudentID = new TextBox();
+            txtPhone = new MaskedTextBox();
+            cmbGender = new ComboBox();
+            cmbYear = new ComboBox();
+            cmbCourse = new ComboBox();
             label7 = new Label();
             label8 = new Label();
             label9 = new Label();
@@ -71,57 +71,19 @@
             groupBox2.SuspendLayout();
             SuspendLayout();
             // 
-            // txtStudentID
-            // 
-            txtStudentID.Font = new Font("Segoe UI", 9F);
-            txtStudentID.Location = new Point(199, 59);
-            txtStudentID.Margin = new Padding(3, 4, 3, 4);
-            txtStudentID.Name = "txtStudentID";
-            txtStudentID.Size = new Size(258, 27);
-            txtStudentID.TabIndex = 1;
-            // 
-            // cmbCourse
-            // 
-            cmbCourse.AutoCompleteCustomSource.AddRange(new string[] { "BSA", "BSCpE", "BSEntrep", "BSHM", "BSIT", "BSEDEN", "BSEDMT", "DOMTLOM" });
-            cmbCourse.Font = new Font("Segoe UI", 9F);
-            cmbCourse.Location = new Point(199, 147);
-            cmbCourse.Margin = new Padding(3, 4, 3, 4);
-            cmbCourse.Name = "cmbCourse";
-            cmbCourse.Size = new Size(258, 27);
-            cmbCourse.TabIndex = 2;
-            // 
             // txtFullName
             // 
             txtFullName.Font = new Font("Segoe UI", 9F);
-            txtFullName.Location = new Point(202, 103);
+            txtFullName.Location = new Point(199, 103);
             txtFullName.Margin = new Padding(3, 4, 3, 4);
             txtFullName.Name = "txtFullName";
             txtFullName.Size = new Size(258, 27);
             txtFullName.TabIndex = 3;
             // 
-            // cmbGender
-            // 
-            cmbGender.AutoCompleteCustomSource.AddRange(new string[] { "Male", "Female", "Non-binary", "Prefer not to say" });
-            cmbGender.Font = new Font("Segoe UI", 9F);
-            cmbGender.Location = new Point(634, 105);
-            cmbGender.Margin = new Padding(3, 4, 3, 4);
-            cmbGender.Name = "cmbGender";
-            cmbGender.Size = new Size(258, 27);
-            cmbGender.TabIndex = 4;
-            // 
-            // cmbYear
-            // 
-            cmbYear.AutoCompleteCustomSource.AddRange(new string[] { "1", "2", "3", "4" });
-            cmbYear.Font = new Font("Segoe UI", 9F);
-            cmbYear.Location = new Point(199, 191);
-            cmbYear.Margin = new Padding(3, 4, 3, 4);
-            cmbYear.Name = "cmbYear";
-            cmbYear.Size = new Size(258, 27);
-            cmbYear.TabIndex = 5;
-            // 
             // dtpDOB
             // 
             dtpDOB.CalendarTitleBackColor = Color.DarkBlue;
+            dtpDOB.CustomFormat = " ";
             dtpDOB.Font = new Font("Segoe UI", 9F);
             dtpDOB.Format = DateTimePickerFormat.Custom;
             dtpDOB.Location = new Point(634, 60);
@@ -129,6 +91,7 @@
             dtpDOB.Name = "dtpDOB";
             dtpDOB.Size = new Size(258, 27);
             dtpDOB.TabIndex = 6;
+            dtpDOB.ValueChanged += dtpDOB_ValueChanged;
             // 
             // txtEmail
             // 
@@ -138,15 +101,6 @@
             txtEmail.Name = "txtEmail";
             txtEmail.Size = new Size(258, 27);
             txtEmail.TabIndex = 7;
-            // 
-            // txtPhone
-            // 
-            txtPhone.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            txtPhone.Location = new Point(634, 195);
-            txtPhone.Margin = new Padding(3, 4, 3, 4);
-            txtPhone.Name = "txtPhone";
-            txtPhone.Size = new Size(258, 27);
-            txtPhone.TabIndex = 8;
             // 
             // btnAdd
             // 
@@ -308,6 +262,11 @@
             // groupBox3
             // 
             groupBox3.BackColor = Color.LightCyan;
+            groupBox3.Controls.Add(txtStudentID);
+            groupBox3.Controls.Add(txtPhone);
+            groupBox3.Controls.Add(cmbGender);
+            groupBox3.Controls.Add(cmbYear);
+            groupBox3.Controls.Add(cmbCourse);
             groupBox3.Controls.Add(label7);
             groupBox3.Controls.Add(label8);
             groupBox3.Controls.Add(label9);
@@ -315,13 +274,8 @@
             groupBox3.Controls.Add(label6);
             groupBox3.Controls.Add(label5);
             groupBox3.Controls.Add(label4);
-            groupBox3.Controls.Add(txtStudentID);
-            groupBox3.Controls.Add(cmbCourse);
             groupBox3.Controls.Add(txtFullName);
-            groupBox3.Controls.Add(cmbGender);
             groupBox3.Controls.Add(label1);
-            groupBox3.Controls.Add(cmbYear);
-            groupBox3.Controls.Add(txtPhone);
             groupBox3.Controls.Add(dtpDOB);
             groupBox3.Controls.Add(txtEmail);
             groupBox3.Font = new Font("Rockwell", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
@@ -332,6 +286,54 @@
             groupBox3.TabIndex = 20;
             groupBox3.TabStop = false;
             groupBox3.Text = "Student Informations";
+            // 
+            // txtStudentID
+            // 
+            txtStudentID.Font = new Font("Segoe UI", 9F);
+            txtStudentID.Location = new Point(199, 59);
+            txtStudentID.Margin = new Padding(3, 4, 3, 4);
+            txtStudentID.Name = "txtStudentID";
+            txtStudentID.Size = new Size(258, 27);
+            txtStudentID.TabIndex = 27;
+            // 
+            // txtPhone
+            // 
+            txtPhone.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            txtPhone.Location = new Point(634, 195);
+            txtPhone.Mask = "(+63) \\900-000-0000";
+            txtPhone.Name = "txtPhone";
+            txtPhone.Size = new Size(258, 27);
+            txtPhone.TabIndex = 26;
+            // 
+            // cmbGender
+            // 
+            cmbGender.Font = new Font("Segoe UI", 9F);
+            cmbGender.FormattingEnabled = true;
+            cmbGender.Items.AddRange(new object[] { "Male", "Female", "Non-binary", "Prefer not to say" });
+            cmbGender.Location = new Point(634, 104);
+            cmbGender.Name = "cmbGender";
+            cmbGender.Size = new Size(253, 28);
+            cmbGender.TabIndex = 24;
+            // 
+            // cmbYear
+            // 
+            cmbYear.Font = new Font("Segoe UI", 9F);
+            cmbYear.FormattingEnabled = true;
+            cmbYear.Items.AddRange(new object[] { "1", "2", "3", "4" });
+            cmbYear.Location = new Point(199, 190);
+            cmbYear.Name = "cmbYear";
+            cmbYear.Size = new Size(253, 28);
+            cmbYear.TabIndex = 23;
+            // 
+            // cmbCourse
+            // 
+            cmbCourse.Font = new Font("Segoe UI", 9F);
+            cmbCourse.FormattingEnabled = true;
+            cmbCourse.Items.AddRange(new object[] { "BSA", "BSCpE", "BSEntrep", "BSHM", "BSIT", "BSEDEN", "BSEDMT", "DOMTLOM" });
+            cmbCourse.Location = new Point(199, 146);
+            cmbCourse.Name = "cmbCourse";
+            cmbCourse.Size = new Size(253, 28);
+            cmbCourse.TabIndex = 22;
             // 
             // label7
             // 
@@ -426,24 +428,26 @@
             dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle3.BackColor = SystemColors.Window;
             dataGridViewCellStyle3.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            dataGridViewCellStyle3.ForeColor = Color.Black;
+            dataGridViewCellStyle3.ForeColor = Color.DarkBlue;
             dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
             dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
             dataGridViewCellStyle3.WrapMode = DataGridViewTriState.False;
             dgvStudents.DefaultCellStyle = dataGridViewCellStyle3;
-            dgvStudents.Location = new Point(47, 44);
+            dgvStudents.Location = new Point(21, 42);
             dgvStudents.Margin = new Padding(3, 4, 3, 4);
             dgvStudents.Name = "dgvStudents";
             dgvStudents.ReadOnly = true;
             dgvStudents.RowHeadersWidth = 51;
-            dgvStudents.Size = new Size(1178, 341);
+            dgvStudents.Size = new Size(1226, 357);
             dgvStudents.TabIndex = 9;
+            dgvStudents.CellClick += dgvStudents_CellClick;
             dgvStudents.CellContentClick += dgvStudents_CellContentClick;
             // 
             // groupBox2
             // 
             groupBox2.Controls.Add(dgvStudents);
             groupBox2.Font = new Font("Rockwell", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            groupBox2.ForeColor = Color.DarkBlue;
             groupBox2.Location = new Point(35, 420);
             groupBox2.Name = "groupBox2";
             groupBox2.Size = new Size(1273, 418);
@@ -477,15 +481,9 @@
         }
 
         #endregion
-
-        private TextBox txtStudentID;
-        private TextBox cmbCourse;
         private TextBox txtFullName;
-        private TextBox cmbGender;
-        private TextBox cmbYear;
         private DateTimePicker dtpDOB;
         private TextBox txtEmail;
-        private TextBox txtPhone;
         private Button btnAdd;
         private Button btnDelete;
         private Button btnUpdate;
@@ -508,5 +506,10 @@
         private PictureBox pictureBox1;
         private DataGridView dgvStudents;
         private GroupBox groupBox2;
+        private ComboBox cmbCourse;
+        private ComboBox cmbYear;
+        private ComboBox cmbGender;
+        private MaskedTextBox txtPhone;
+        private TextBox txtStudentID;
     }
 }

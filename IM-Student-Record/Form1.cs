@@ -37,7 +37,7 @@ namespace IM_Student_Record
             }
         }
 
-        
+
         private void btnAdd_Click(object sender, EventArgs e)
         {
             // Validates empty fields
@@ -93,6 +93,15 @@ namespace IM_Student_Record
 
                         //LoadGridData();
                     }
+
+                    txtFullName.Clear();
+                    txtEmail.Clear();
+                    txtPhone.Clear();
+                    txtStudentID.Clear();
+                    cmbCourse.Text = null;
+                    cmbGender.Text = null;
+                    cmbYear.Text = null;
+                    dtpDOB.Format = DateTimePickerFormat.Custom;
                 }
             }
             catch (MySqlException ex)
@@ -202,6 +211,15 @@ namespace IM_Student_Record
                 {
                     MessageBox.Show("Error deleting record: " + ex.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+
+                txtFullName.Clear();
+                txtEmail.Clear();
+                txtPhone.Clear();
+                txtStudentID.Clear();
+                cmbCourse.Text = null;
+                cmbGender.Text = null;
+                cmbYear.Text = null;
+                dtpDOB.Format = DateTimePickerFormat.Custom;
             }
         }
 
@@ -223,6 +241,35 @@ namespace IM_Student_Record
         private void label8_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void dgvStudents_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                DataGridViewRow row = this.dgvStudents.Rows[e.RowIndex];
+
+                txtStudentID.Text = row.Cells["Student ID"].Value.ToString();
+                txtFullName.Text = row.Cells["Full Name"].Value.ToString();
+                txtEmail.Text = row.Cells["Email"].Value.ToString();
+                txtPhone.Text = row.Cells["Phone"].Value.ToString();
+
+                cmbCourse.Text = row.Cells["Course"].Value.ToString();
+                cmbYear.Text = row.Cells["Year"].Value.ToString();
+                cmbGender.Text = row.Cells["Gender"].Value.ToString();
+
+                if (row.Cells["Date of Birth"].Value != DBNull.Value && row.Cells["Date of Birth"].Value != null)
+                {
+                    dtpDOB.Value = Convert.ToDateTime(row.Cells["Date of Birth"].Value);
+
+                    dtpDOB.Format = DateTimePickerFormat.Short;
+                }
+            }
+        }
+
+        private void dtpDOB_ValueChanged(object sender, EventArgs e)
+        {
+            dtpDOB.Format = DateTimePickerFormat.Short;
         }
     }
 }
