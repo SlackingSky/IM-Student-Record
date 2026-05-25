@@ -93,17 +93,9 @@ namespace IM_Student_Record
 
                         //LoadGridData();
                     }
-
-                    txtFullName.Clear();
-                    txtEmail.Clear();
-                    txtPhone.Clear();
-                    txtStudentID.Clear();
-                    cmbCourse.Text = null;
-                    cmbGender.Text = null;
-                    cmbYear.Text = null;
-                    dtpDOB.Format = DateTimePickerFormat.Custom;
                 }
             }
+
             catch (MySqlException ex)
             {
                 if (ex.Number == 1062) // In case the ID itself matches
@@ -119,6 +111,15 @@ namespace IM_Student_Record
             {
                 MessageBox.Show("General Error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+
+            txtFullName.Clear();
+            txtEmail.Clear();
+            txtPhone.Clear();
+            txtStudentID.Clear();
+            cmbCourse.Text = null;
+            cmbGender.Text = null;
+            cmbYear.Text = null;
+            dtpDOB.Format = DateTimePickerFormat.Custom;
         }
 
         private void btnUpdate_Click(object sender, EventArgs e)
@@ -166,6 +167,15 @@ namespace IM_Student_Record
             {
                 MessageBox.Show("Error updating record: " + ex.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+
+            txtFullName.Clear();
+            txtEmail.Clear();
+            txtPhone.Clear();
+            txtStudentID.Clear();
+            cmbCourse.Text = null;
+            cmbGender.Text = null;
+            cmbYear.Text = null;
+            dtpDOB.Format = DateTimePickerFormat.Custom;
         }
 
         private void btnDelete_Click(object sender, EventArgs e)
@@ -271,5 +281,110 @@ namespace IM_Student_Record
         {
             dtpDOB.Format = DateTimePickerFormat.Short;
         }
+
+        private void frmStudentRec_Load(object sender, EventArgs e)
+        {
+            LoadGridData();
+
+            dgvStudents.ClearSelection();
+
+            dtpDOB.Value = DateTime.Today.AddYears(-16);
+            dtpDOB.MaxDate = DateTime.Today.AddYears(-16);
+
+            dtpDOB.Format = DateTimePickerFormat.Custom;
+        }
+
+        private void txtFullName_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsLetter(e.KeyChar) && !char.IsControl(e.KeyChar) && !char.IsWhiteSpace(e.KeyChar) &&
+                 e.KeyChar != ',' && e.KeyChar != '.')
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void txtPhone_Leave(object sender, EventArgs e)
+        {
+
+            // Check if the user typed any actual numbers into the mask
+            bool hasNumbers = txtPhone.Text.Replace("+63", "").Replace(" ", "").Replace("(", "").Replace(")", "").Replace("-", "").Length > 0;
+
+            if (hasNumbers && !txtPhone.MaskFull)
+            {
+                MessageBox.Show("Phone number is incomplete. Please fill out all 10 digits.", "Incomplete Entry", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+                txtPhone.Focus();
+            }
+        }
+
+        private void txtFullName_Leave(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtFullName.Text))
+            {
+                return;
+            }
+
+            // This turns "smith, john" into "Smith, John" automatically!
+            txtFullName.Text = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(txtFullName.Text.ToLower());
+
+            // Ensure they included the comma for the "Last Name, First Name" standard
+            if (!txtFullName.Text.Contains(","))
+            {
+                MessageBox.Show("Please use the standard university format:\n\nLast Name, First Name M.I.\n(Example: Juan, Ponze C.)",
+                                "Incorrect Format",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Warning);
+
+                txtFullName.Focus(); // Push them back to fix it
+            }
+        }
+
+        private void txtEmail_Leave(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtEmail.Text))
+            {
+                return;
+            }
+
+            txtEmail.Text = txtEmail.Text.ToLower().Trim();
+
+            // This rule means: [Text] @ [Text] . [Text]
+            string strictEmailRule = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+
+            if (!System.Text.RegularExpressions.Regex.IsMatch(txtEmail.Text, strictEmailRule))
+            {
+                MessageBox.Show("Please enter a complete email address including the domain.\n\nExample: student@gmail.com",
+                                "Invalid Email",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Warning);
+
+                txtEmail.Focus();
+            }
+        }
+
+        private void txtStudentID_Leave(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtStudentID.Text))
+            {
+                MessageBox.Show("Please enter the ID number.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtStudentID.Focus();
+                return;
+            }
+
+            // 2. The Format Check (Catches pasted text or numbers that are too large)
+            if (!int.TryParse(txtStudentID.Text, out int safeStudentID))
+            {
+                // THIS is your custom error message if it is not a valid number!
+                MessageBox.Show("Please enter a valid number for the Student ID.\n\n(Letters and symbols are not allowed.)",
+                                "Invalid Input",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+
+                txtStudentID.Clear(); 
+                txtStudentID.Focus(); 
+                return; 
+            }
+        }
     }
 }
+
