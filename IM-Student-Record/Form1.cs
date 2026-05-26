@@ -669,6 +669,7 @@ namespace IM_Student_Record
         private void frmStudentRec_Load(object sender, EventArgs e)
         {
             LoadGridData();
+            this.ShowIcon = false;       // Hides form icon mwehehehe
         }
     }
 }
