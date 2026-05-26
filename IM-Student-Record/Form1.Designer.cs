@@ -42,6 +42,8 @@
             pbSRS = new PictureBox();
             lblSRS = new Label();
             panel1 = new Panel();
+            cmbSection = new ComboBox();
+            lblSection = new Label();
             label1 = new Label();
             label2 = new Label();
             ((System.ComponentModel.ISupportInitialize)dgvStudents).BeginInit();
@@ -88,7 +90,7 @@
             // 
             cmbCourse.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbCourse.Font = new Font("Segoe UI", 12F);
-            cmbCourse.Items.AddRange(new object[] { "Computer Science", "Information Technology", "Computer Engineering", "Information Systems", "Multimedia Arts" });
+            cmbCourse.Items.AddRange(new object[] { "Bachelor of Science in Accountancy", "Bachelor of Science in Computer Engineering", "Bachelor of Science in Entrepreneurship", "Bachelor of Science in Hospitality Management", "Bachelor of Science in Information Technology", "Bachelor of Secondary Education major in English", "Bachelor of Secondary Education major in Mathematics", "Diploma in Office Management Technology with Specialization in Legal Office Management " });
             cmbCourse.Location = new Point(658, 55);
             cmbCourse.Name = "cmbCourse";
             cmbCourse.Size = new Size(346, 29);
@@ -101,7 +103,7 @@
             cmbYear.Items.AddRange(new object[] { "1", "2", "3", "4" });
             cmbYear.Location = new Point(658, 96);
             cmbYear.Name = "cmbYear";
-            cmbYear.Size = new Size(346, 29);
+            cmbYear.Size = new Size(129, 29);
             cmbYear.TabIndex = 5;
             // 
             // txtEmail
@@ -127,7 +129,7 @@
             dgvStudents.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
             dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle2.BackColor = Color.SteelBlue;
-            dataGridViewCellStyle2.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F);
             dataGridViewCellStyle2.ForeColor = Color.White;
             dataGridViewCellStyle2.SelectionBackColor = Color.SteelBlue;
             dataGridViewCellStyle2.SelectionForeColor = Color.White;
@@ -136,8 +138,8 @@
             dgvStudents.ColumnHeadersHeight = 40;
             dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle3.BackColor = Color.White;
-            dataGridViewCellStyle3.Font = new Font("Segoe UI", 11F);
-            dataGridViewCellStyle3.ForeColor = Color.DimGray;
+            dataGridViewCellStyle3.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle3.ForeColor = SystemColors.ControlText;
             dataGridViewCellStyle3.Padding = new Padding(5);
             dataGridViewCellStyle3.SelectionBackColor = Color.LightSteelBlue;
             dataGridViewCellStyle3.SelectionForeColor = Color.Black;
@@ -352,6 +354,8 @@
             panel1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             panel1.BackColor = Color.White;
             panel1.BorderStyle = BorderStyle.FixedSingle;
+            panel1.Controls.Add(cmbSection);
+            panel1.Controls.Add(lblSection);
             panel1.Controls.Add(lblStudentID);
             panel1.Controls.Add(lblFullName);
             panel1.Controls.Add(label1);
@@ -376,6 +380,27 @@
             panel1.Name = "panel1";
             panel1.Size = new Size(1022, 247);
             panel1.TabIndex = 26;
+            // 
+            // cmbSection
+            // 
+            cmbSection.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbSection.Font = new Font("Segoe UI", 12F);
+            cmbSection.Items.AddRange(new object[] { "1", "2", "3", "4" });
+            cmbSection.Location = new Point(874, 96);
+            cmbSection.Name = "cmbSection";
+            cmbSection.Size = new Size(129, 29);
+            cmbSection.TabIndex = 28;
+            // 
+            // lblSection
+            // 
+            lblSection.AutoSize = true;
+            lblSection.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold);
+            lblSection.ForeColor = Color.SteelBlue;
+            lblSection.Location = new Point(799, 99);
+            lblSection.Name = "lblSection";
+            lblSection.Size = new Size(69, 21);
+            lblSection.TabIndex = 29;
+            lblSection.Text = "Section:";
             // 
             // label1
             // 
@@ -454,5 +479,7 @@
         private Panel panel1;
         private Label label1;
         private Label label2;
+        private ComboBox cmbSection;
+        private Label lblSection;
     }
 }

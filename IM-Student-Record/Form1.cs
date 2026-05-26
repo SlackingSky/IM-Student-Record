@@ -671,5 +671,6 @@ namespace IM_Student_Record
             LoadGridData();
             this.ShowIcon = false;       // Hides form icon mwehehehe
         }
+
     }
 }
