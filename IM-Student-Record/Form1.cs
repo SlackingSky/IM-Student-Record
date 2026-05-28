@@ -1,11 +1,25 @@
 using Microsoft.Extensions.Configuration;
+using Microsoft.VisualBasic;
+using Microsoft.VisualBasic.Devices;
 using MySqlConnector;
 using System.Data;
 using System.Text;
 using System.Text.RegularExpressions;
+using static System.Collections.Specialized.BitVector32;
 
 namespace IM_Student_Record
 {
+    // ================== STUDENT RECORD MANAGEMENT SYSTEM (C# WinForms) ==================
+    // This application allows users to manage student records with features to add, update, delete, and view records in a MySQL database.
+    // Key Features:
+    // 1. Auto-generated Student ID with gap filling (reuses deleted IDs).
+    // 2. Comprehensive validation for all input fields, including duplicate checks for email and phone.
+    // 3. User-friendly error messages and confirmation dialogs for critical actions.
+    // 4. Data grid view to display all student records with selection for editing.
+    // 5. Form design with fixed size and disabled resizing for consistent user experience.
+    // Note: Ensure that the MySQL database is set up with a 'students' table matching the expected schema for this application to function correctly.
+
+    // ================== CONSTRUCTOR AND INITIALIZATION ==================
     public partial class frmStudentRec : Form
     {
         private readonly string connString = dbconnector.GetConnectionString();
@@ -21,22 +35,50 @@ namespace IM_Student_Record
 
             SetupForm();
             LoadGridData();
+            ClearForm();
+            ClearSelection();
+
+            this.Shown += (s, e) =>
+            {
+                ClearForm();
+                ClearSelection();
+                this.ActiveControl = null;  // No control focused
+            };
         }
 
+        // ========== FORM SETUP (Read-only Student ID, Phone Mask, Name Capitalization) ==========
         private void SetupForm()
         {
-            // Make Student ID read-only and auto-generated
-            txtStudentID.ReadOnly = true;
-            txtStudentID.BackColor = Color.LightGray;
-            txtStudentID.Text = "Auto-generated";
+            // Make Student ID editable (user will enter PUP format)
+            txtStudentID.ReadOnly = false;
+            txtStudentID.BackColor = Color.White;
 
             // Set default Phone mask properties
             mtbPhone.PromptChar = ' ';
             mtbPhone.TextMaskFormat = MaskFormat.IncludeLiterals;
 
+            // Setup placeholders for textboxes
+            SetupPlaceholders();
+
+            // Use tooltip version for email instead of regular placeholder
+            SetupEmailWithTooltip();
+
+            // Setup comboboxes with default selections
+            SetupComboBoxes();
+
+            // Set default Date of Birth
+            dtpDOB.Value = DateTime.Now.AddYears(-18);
+
+            // Disable automatic selection in DataGridView
+            dgvStudents.TabStop = false;  // Prevents tab from selecting grid
+
+            // Clear any default selection
+            dgvStudents.ClearSelection();
+
+            // Your existing Leave event for Full Name
             txtFullName.Leave += (s, e) =>
             {
-                if (!string.IsNullOrWhiteSpace(txtFullName.Text))
+                if (!string.IsNullOrWhiteSpace(txtFullName.Text) && txtFullName.Text != "Dela Cruz, Juan M.")
                 {
                     string text = txtFullName.Text.Trim();
                     System.Globalization.TextInfo ti = System.Globalization.CultureInfo.CurrentCulture.TextInfo;
@@ -51,11 +93,166 @@ namespace IM_Student_Record
                         txtFullName.Text = capitalized;
                     }
                 }
-                ValidateFullName();
             };
 
+            // Setup real-time visual validation (no message boxes)
+            SetupRealTimeValidation();
+
+            // Hide "Others" textbox initially
+            txtOthers.Visible = false;
+            lblOthers.Visible = false;
         }
 
+        // ========== PLACEHOLDER, TOOLTIP, & COMBOBOX SETUP METHODS ==========
+        private void SetupPlaceholders()
+        {
+            SetPlaceholder(txtStudentID, "2025-00126-SM-0");
+            SetPlaceholder(txtFullName, "Dela Cruz, Juan M.");
+            SetPlaceholder(txtEmail, "juandelacruz@iskolarngbayan.pup.edu.ph");
+        }
+
+        private void SetPlaceholder(TextBox textBox, string placeholderText)
+        {
+            textBox.Tag = placeholderText;
+            textBox.Text = placeholderText;
+            textBox.ForeColor = Color.Gray;
+
+            textBox.Enter += (s, e) =>
+            {
+                if (textBox.Text == placeholderText)
+                {
+                    textBox.Text = "";
+                    textBox.ForeColor = Color.Black;
+                }
+            };
+
+            textBox.Leave += (s, e) =>
+            {
+                if (string.IsNullOrWhiteSpace(textBox.Text))
+                {
+                    textBox.Text = placeholderText;
+                    textBox.ForeColor = Color.Gray;
+                }
+            };
+        }
+
+        private void SetupEmailWithTooltip()
+        {
+            string placeholderText = "juandelacruz@iskolarngbayan.pup.edu.ph";
+            string tooltipText = "Use your PUP email: firstnameMIlastname@iskolarngbayan.pup.edu.ph\n" +
+                                 "Or use Gmail: username@gmail.com";
+
+            // Set placeholder
+            txtEmail.Tag = placeholderText;
+            txtEmail.Text = placeholderText;
+            txtEmail.ForeColor = Color.Gray;
+
+            // Add tooltip
+            toolTip1.SetToolTip(txtEmail, tooltipText);
+            toolTip1.ToolTipTitle = "Email Format";
+            toolTip1.ToolTipIcon = ToolTipIcon.Info;
+            toolTip1.IsBalloon = true;  // Optional: balloon style
+
+            // Placeholder behavior
+            txtEmail.Enter += (s, e) =>
+            {
+                if (txtEmail.Text == placeholderText)
+                {
+                    txtEmail.Text = "";
+                    txtEmail.ForeColor = Color.Black;
+                }
+            };
+
+            txtEmail.Leave += (s, e) =>
+            {
+                if (string.IsNullOrWhiteSpace(txtEmail.Text))
+                {
+                    txtEmail.Text = placeholderText;
+                    txtEmail.ForeColor = Color.Gray;
+                }
+            };
+        }
+
+        private void SetupComboBoxes()
+        {
+            // Gender ComboBox
+            cmbGender.Items.Clear();
+            cmbGender.Items.Add("-- Select Gender --");
+            cmbGender.Items.Add("Male");
+            cmbGender.Items.Add("Female");
+            cmbGender.Items.Add("Others");
+            cmbGender.SelectedIndex = 0;
+            cmbGender.DropDownStyle = ComboBoxStyle.DropDownList;
+
+            // Course ComboBox
+            cmbCourse.Items.Clear();
+            cmbCourse.Items.Add("-- Select Courses --");
+            cmbCourse.Items.Add("Bachelor of Science in Accountancy");
+            cmbCourse.Items.Add("Bachelor of Science in Computer Engineering");
+            cmbCourse.Items.Add("Bachelor of Science in Entrepreneurship");
+            cmbCourse.Items.Add("Bachelor of Science in Hospitality Management");
+            cmbCourse.Items.Add("Bachelor of Science in Information Technology");
+            cmbCourse.Items.Add("Bachelor of Secondary Education major in English");
+            cmbCourse.Items.Add("Bachelor of Secondary Education major in Mathematics");
+            cmbCourse.Items.Add("Diploma in Office Management Technology with Specialization in Legal Office Management");
+            cmbCourse.SelectedIndex = 0;
+            cmbCourse.DropDownStyle = ComboBoxStyle.DropDownList;
+
+            // Year Level ComboBox
+            cmbYear.Items.Clear();
+            cmbYear.Items.Add("-- Select Year --");
+            cmbYear.Items.Add("1");
+            cmbYear.Items.Add("2");
+            cmbYear.Items.Add("3");
+            cmbYear.Items.Add("4");
+            cmbYear.SelectedIndex = 0;
+            cmbYear.DropDownStyle = ComboBoxStyle.DropDownList;
+
+            // Section ComboBox (if needed, otherwise remove this)
+            cmbSection.Items.Clear();
+            cmbSection.Items.Add("-- Select Section --");
+            cmbSection.Items.Add("1");
+            cmbSection.Items.Add("2");
+            cmbSection.Items.Add("3");
+            cmbSection.Items.Add("4");
+            cmbSection.SelectedIndex = 0;
+            cmbSection.DropDownStyle = ComboBoxStyle.DropDownList;
+        }
+
+        // ================== PUP ID CONVERSION METHODS ==================
+        // Convert PUP format to number for database storage
+        // Input: "2025-00126-SM-0" or "2025-00126-SM-1"
+        // Output: 2025001260 or 2025001261
+        private int ConvertPUPToNumber(string pupId)
+        {
+            // Remove everything except numbers
+            string numbersOnly = Regex.Replace(pupId, @"[^0-9]", "");
+            return int.Parse(numbersOnly);
+        }
+
+        // Convert number back to PUP format for display
+        // Input: 2025001260
+        // Output: "2025-00126-SM-0"
+        private string ConvertNumberToPUP(int number)
+        {
+            string numStr = number.ToString();
+
+            // Ensure we have enough digits
+            if (numStr.Length >= 10)
+            {
+                string year = numStr.Substring(0, 4);        // "2025"
+                string enrollNo = numStr.Substring(4, 5);    // "00126"
+                string type = numStr.Substring(9, 1);        // "0" or "1"
+
+                // Campus is always "SM" as you mentioned
+                return $"{year}-{enrollNo}-SM-{type}";
+            }
+
+            return numStr;
+        }
+
+
+        // ================== DATABASE HELPER METHODS ==================
 
         // ========== GET NEXT STUDENT ID (Fills gaps - reuses deleted IDs) ==========
         private int GetNextStudentID()
@@ -173,9 +370,10 @@ namespace IM_Student_Record
                 using (MySqlConnection conn = new MySqlConnection(connString))
                 {
                     conn.Open();
+                    // updated the query to include section
                     string query = "SELECT student_id AS 'Student ID', full_name AS 'Full Name', " +
                                    "date_of_birth AS 'Date of Birth', gender AS 'Gender', " +
-                                   "course AS 'Course', year_level AS 'Year', " +
+                                   "course AS 'Course', year_level AS 'Year', section AS 'Section', " +  // ADD THIS
                                    "email AS 'Email', phone AS 'Phone' FROM students ORDER BY student_id";
 
                     using (MySqlDataAdapter adapter = new MySqlDataAdapter(query, conn))
@@ -184,12 +382,8 @@ namespace IM_Student_Record
                         adapter.Fill(dt);
                         dgvStudents.DataSource = dt;
 
-                        // Update the "Auto-generated" text to show next available ID
-                        if (dt.Rows.Count > 0)
-                        {
-                            int nextId = GetNextStudentID();
-                            txtStudentID.Text = $"Will be: {nextId}";
-                        }
+                        // Clear any selection after loading data
+                        ClearSelection();
                     }
                 }
             }
@@ -201,9 +395,160 @@ namespace IM_Student_Record
         }
 
         // ========== VALIDATION METHODS ==========
+        private void SetupRealTimeValidation()
+        {
+            // Real-time visual feedback (no message boxes)
+            txtFullName.Leave += (s, e) =>
+            {
+                if (!string.IsNullOrWhiteSpace(txtFullName.Text) && txtFullName.Text != "Dela Cruz, Juan M.")
+                {
+                    string fullName = txtFullName.Text.Trim();
+                    if (!fullName.Contains(","))
+                    {
+                        txtFullName.BackColor = Color.LightPink;  // Highlight invalid
+                    }
+                    else
+                    {
+                        txtFullName.BackColor = Color.White;  // Clear highlight
+                    }
+                }
+                else
+                {
+                    txtFullName.BackColor = Color.White;
+                }
+            };
+
+            txtStudentID.Leave += (s, e) =>
+            {
+                if (!string.IsNullOrWhiteSpace(txtStudentID.Text) && txtStudentID.Text != "2025-00126-SM-0")
+                {
+                    Regex pupIdRegex = new Regex(@"^\d{4}-\d{5}-SM-[01]$");
+                    if (!pupIdRegex.IsMatch(txtStudentID.Text.Trim()))
+                    {
+                        txtStudentID.BackColor = Color.LightPink;
+                    }
+                    else
+                    {
+                        txtStudentID.BackColor = Color.White;
+                    }
+                }
+                else
+                {
+                    txtStudentID.BackColor = Color.White;
+                }
+            };
+
+            txtEmail.Leave += (s, e) =>
+            {
+                if (!string.IsNullOrWhiteSpace(txtEmail.Text) && txtEmail.Text != "juandelacruz@iskolarngbayan.pup.edu.ph")
+                {
+                    try
+                    {
+                        var addr = new System.Net.Mail.MailAddress(txtEmail.Text.Trim());
+                        if (addr.Address != txtEmail.Text.Trim())
+                        {
+                            txtEmail.BackColor = Color.LightPink;
+                        }
+                        else
+                        {
+                            txtEmail.BackColor = Color.White;
+                        }
+                    }
+                    catch
+                    {
+                        txtEmail.BackColor = Color.LightPink;
+                    }
+                }
+                else
+                {
+                    txtEmail.BackColor = Color.White;
+                }
+            };
+        }
+
+        private bool ValidateStudentID()
+        {
+            // Skip if placeholder is showing
+            if (txtStudentID.Text == "2025-00126-SM-0" || string.IsNullOrWhiteSpace(txtStudentID.Text))
+            {
+                MessageBox.Show("Student ID is required!", "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtStudentID.Focus();
+                return false;
+            }
+
+            string studentId = txtStudentID.Text.Trim();
+
+            Regex pupIdRegex = new Regex(@"^\d{4}-\d{5}-SM-[01]$");
+
+            if (!pupIdRegex.IsMatch(studentId))
+            {
+                MessageBox.Show(
+                    "Invalid Student ID Format!\n\n" +
+                    "Please use this format: YYYY-NNNNN-SM-0 or YYYY-NNNNN-SM-1\n\n" +
+                    "Examples:\n" +
+                    "✓ 2025-00126-SM-0 (Regular student)\n" +
+                    "✓ 2025-00126-SM-1 (Transferee)",
+                    "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtStudentID.Focus();
+                return false;
+            }
+
+            // Extract year for validation
+            string yearPart = studentId.Substring(0, 4);
+            int year = int.Parse(yearPart);
+            int currentYear = DateTime.Now.Year;
+
+            // PUP Sta. Maria was founded in 2005
+            const int pupFoundingYear = 2005;
+
+            // Check if year is before PUP Sta. Maria was founded
+            if (year < pupFoundingYear)
+            {
+                MessageBox.Show($"PUP Sta. Maria Campus was founded in {pupFoundingYear}.\n\n" +
+                               $"Student ID year '{year}' is before the campus existed!\n\n" +
+                               $"Please enter a year from {pupFoundingYear} onwards.",
+                    "Invalid Year", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtStudentID.Focus();
+                return false;
+            }
+
+            // Check if year is in the future
+            if (year > currentYear)
+            {
+                MessageBox.Show($"Student ID year cannot be in the future!\n\n" +
+                               $"Current year is {currentYear}. Please enter a valid year.",
+                    "Invalid Year", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtStudentID.Focus();
+                return false;
+            }
+
+            // Optional: Add warning for very old students (older than 20 years)
+            if (currentYear - year > 20)
+            {
+                DialogResult result = MessageBox.Show(
+                    $"Student ID year is {year} ({currentYear - year} years ago).\n\n" +
+                    $"This student would be older than typical college age.\n\n" +
+                    $"Continue anyway?",
+                    "Unusual Year Warning",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+
+                if (result == DialogResult.No)
+                {
+                    txtStudentID.Focus();
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         private bool ValidateFullName()
         {
-            if (string.IsNullOrWhiteSpace(txtFullName.Text))
+            // Skip if placeholder is showing
+            if (txtFullName.Text == "Dela Cruz, Juan M." || string.IsNullOrWhiteSpace(txtFullName.Text))
             {
                 MessageBox.Show("Full Name is required!", "Validation Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -213,7 +558,6 @@ namespace IM_Student_Record
 
             string fullName = txtFullName.Text.Trim();
 
-            // Simple check: must contain a comma
             if (!fullName.Contains(","))
             {
                 MessageBox.Show(
@@ -223,18 +567,9 @@ namespace IM_Student_Record
                     "✓ Gonzales III, Pedro B.\n" +
                     "✓ Santos, Maria C.\n" +
                     "✓ Dela Cruz, Juan M.\n" +
-                    "✓ Sarmiento, Sharlynne Jemima\n" +
-                    "✓ Reyes, Ana",
+                    "✓ Sarmiento, Sharlynne Jemima",
                     "Validation Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtFullName.Focus();
-                return false;
-            }
-
-            if (fullName.Length < 5)
-            {
-                MessageBox.Show("Please enter a complete full name!",
-                    "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtFullName.Focus();
                 return false;
             }
@@ -277,19 +612,40 @@ namespace IM_Student_Record
 
         private bool ValidateGender()
         {
-            if (string.IsNullOrWhiteSpace(cmbGender.Text))
+            if (cmbGender.SelectedIndex == 0 || cmbGender.SelectedIndex == -1)  // Skip placeholder
             {
                 MessageBox.Show("Please select a Gender!", "Validation Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 cmbGender.Focus();
                 return false;
             }
+
+            // If "Others" is selected, check if textbox is filled
+            if (cmbGender.SelectedItem?.ToString() == "Others")
+            {
+                if (string.IsNullOrWhiteSpace(txtOthers.Text))
+                {
+                    MessageBox.Show("Please specify your gender!", "Validation Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtOthers.Focus();
+                    return false;
+                }
+                // pa-change na lang please kapag na edit na yung varchar limit sa database thanks
+                if (txtOthers.Text.Length > 8)
+                {
+                    MessageBox.Show("Gender specification too long (max 8 chars)!", "Validation Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtOthers.Focus();
+                    return false;
+                }
+            }
+
             return true;
         }
 
         private bool ValidateCourse()
         {
-            if (string.IsNullOrWhiteSpace(cmbCourse.Text))
+            if (cmbCourse.SelectedIndex == 0 || cmbCourse.SelectedIndex == -1)  // Skip placeholder
             {
                 MessageBox.Show("Please select a Course!", "Validation Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -301,7 +657,7 @@ namespace IM_Student_Record
 
         private bool ValidateYearLevel()
         {
-            if (string.IsNullOrWhiteSpace(cmbYear.Text))
+            if (cmbYear.SelectedIndex == 0 || cmbYear.SelectedIndex == -1)  // Skip placeholder
             {
                 MessageBox.Show("Please select a Year Level!", "Validation Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -311,10 +667,23 @@ namespace IM_Student_Record
             return true;
         }
 
-        // ========== EMAIL VALIDATION (with duplicate check) ==========
+        private bool ValidateSection()
+        {
+            if (cmbSection.SelectedIndex == 0 || cmbSection.SelectedIndex == -1)  // Skip placeholder
+            {
+                MessageBox.Show("Please select a Section!", "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                cmbSection.Focus();
+                return false;
+            }
+            return true;
+        }
+
+        // EMAIL VALIDATION (with duplicate check) 
         private bool ValidateEmail(bool isUpdate = false)
         {
-            if (string.IsNullOrWhiteSpace(txtEmail.Text))
+            // Skip if placeholder is showing
+            if (txtEmail.Text == "juandelacruz@iskolarngbayan.pup.edu.ph" || string.IsNullOrWhiteSpace(txtEmail.Text))
             {
                 MessageBox.Show("Email address is required!", "Validation Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -324,7 +693,6 @@ namespace IM_Student_Record
 
             string email = txtEmail.Text.Trim().ToLower();
 
-            // Check email format
             try
             {
                 var addr = new System.Net.Mail.MailAddress(email);
@@ -345,8 +713,8 @@ namespace IM_Student_Record
             }
 
             // Check for duplicate email (skip during update if it's the same student)
-            int? excludeId = isUpdate && !string.IsNullOrWhiteSpace(txtStudentID.Text) && txtStudentID.Text != "Auto-generated" && !txtStudentID.Text.StartsWith("Will be:")
-                ? int.Parse(txtStudentID.Text)
+            int? excludeId = isUpdate && !string.IsNullOrWhiteSpace(txtStudentID.Text) && txtStudentID.Text != "2025-00126-SM-0"
+                ? ConvertPUPToNumber(txtStudentID.Text)
                 : (int?)null;
 
             if (IsEmailDuplicate(email, excludeId))
@@ -361,7 +729,7 @@ namespace IM_Student_Record
             return true;
         }
 
-        // ========== PHONE VALIDATION (with duplicate check) ==========
+        // PHONE VALIDATION (with duplicate check) 
         private bool ValidatePhone(bool isUpdate = false)
         {
             if (string.IsNullOrWhiteSpace(mtbPhone.Text))
@@ -392,9 +760,9 @@ namespace IM_Student_Record
             }
 
             // Check for duplicate phone number
-            int? excludeId = isUpdate && !string.IsNullOrWhiteSpace(txtStudentID.Text) && txtStudentID.Text != "Auto-generated" && !txtStudentID.Text.StartsWith("Will be:")
-                ? int.Parse(txtStudentID.Text)
-                : (int?)null;
+            int? excludeId = isUpdate && !string.IsNullOrWhiteSpace(txtStudentID.Text) && txtStudentID.Text != "2025-00126-SM-0"
+            ? ConvertPUPToNumber(txtStudentID.Text)
+            : (int?)null;
 
             if (IsPhoneDuplicate(mtbPhone.Text.Trim(), excludeId))
             {
@@ -410,35 +778,79 @@ namespace IM_Student_Record
 
         private bool ValidateAllFields(bool isUpdate = false)
         {
+            if (!ValidateStudentID()) return false;
             if (!ValidateFullName()) return false;
             if (!ValidateDOB()) return false;
             if (!ValidateGender()) return false;
             if (!ValidateCourse()) return false;
             if (!ValidateYearLevel()) return false;
+            if (!ValidateSection()) return false;
             if (!ValidateEmail(isUpdate)) return false;
             if (!ValidatePhone(isUpdate)) return false;
 
             return true;
         }
 
+        // ========== UI HELPERS ==========
+
         private void ClearForm()
         {
-            txtFullName.Clear();
-            dtpDOB.Value = DateTime.Now.AddYears(-18);
-            cmbGender.SelectedIndex = -1;
-            cmbCourse.SelectedIndex = -1;
-            cmbYear.SelectedIndex = -1;
-            txtEmail.Clear();
-            mtbPhone.Clear();
+            // Reset textboxes to placeholders
+            txtStudentID.Text = "2025-00126-SM-0";
+            txtStudentID.ForeColor = Color.Gray;
 
-            // Show next available ID instead of "Auto-generated"
-            int nextId = GetNextStudentID();
-            txtStudentID.Text = $"Will be: {nextId}";
+            txtFullName.Text = "Dela Cruz, Juan M.";
+            txtFullName.ForeColor = Color.Gray;
+
+            txtEmail.Text = "juandelacruz@iskolarngbayan.pup.edu.ph";
+            txtEmail.ForeColor = Color.Gray;
+
+            // Clear phone
+            mtbPhone.Text = "";
+
+            // Reset comboboxes to default selection (placeholder)
+            cmbGender.SelectedIndex = 0;   // "-- Select Gender --"
+            cmbCourse.SelectedIndex = 0;    // "-- Select Course --"
+            cmbYear.SelectedIndex = 0;      // "-- Select Year --"
+            cmbSection.SelectedIndex = 0;   // "-- Select Section --" (NEW)
+
+            // Hide "Others" textbox
+            txtOthers.Visible = false;
+            txtOthers.Text = "";
+            lblOthers.Visible = false;
+
+            // Reset DatePicker
+            dtpDOB.Value = DateTime.Now.AddYears(-18);
+
+            // Remove focus from any control
+            this.ActiveControl = null;
         }
 
-        // ========== ADD BUTTON (with C# auto-increment) ==========
+        // CLEAR DATAGRIDVIEW SELECTION
+        private void ClearSelection()
+        {
+            // Clear any selected rows in DataGridView
+            if (dgvStudents.Rows.Count > 0)
+            {
+                dgvStudents.ClearSelection();
+            }
+
+            // Also ensure no cell is selected
+            dgvStudents.CurrentCell = null;
+        }
+
+
+
+        // ================== CRUD OPERATIONS ==================
+        // ADD BUTTON 
         private void btnAdd_Click(object sender, EventArgs e)
         {
+            // Only here we show error messages
+            if (!ValidateAllFields(isUpdate: false))
+            {
+                return;  // Validation failed with message box
+            }
+
             if (!ValidateAllFields(isUpdate: false))
             {
                 return;
@@ -450,14 +862,27 @@ namespace IM_Student_Record
                 {
                     conn.Open();
 
-                    // Get the name in display format for duplicate check
-                    string displayName = txtFullName.Text.Trim();
+                    // Check for duplicate student ID
+                    string checkIdQuery = "SELECT COUNT(*) FROM students WHERE student_id = @id";
+                    using (MySqlCommand checkCmd = new MySqlCommand(checkIdQuery, conn))
+                    {
+                        int studentIdNumber = ConvertPUPToNumber(txtStudentID.Text.Trim());
+                        checkCmd.Parameters.AddWithValue("@id", studentIdNumber);
+
+                        int count = Convert.ToInt32(checkCmd.ExecuteScalar());
+                        if (count > 0)
+                        {
+                            MessageBox.Show($"Student ID '{txtStudentID.Text}' already exists!",
+                                "Duplicate ID", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            return;
+                        }
+                    }
 
                     // Check for duplicate student (Same Name AND Date of Birth)
                     string checkQuery = "SELECT COUNT(*) FROM students WHERE full_name = @checkName AND date_of_birth = @checkDob";
                     using (MySqlCommand checkCmd = new MySqlCommand(checkQuery, conn))
                     {
-                        checkCmd.Parameters.AddWithValue("@checkName", displayName);
+                        checkCmd.Parameters.AddWithValue("@checkName", txtFullName.Text.Trim());
                         checkCmd.Parameters.AddWithValue("@checkDob", dtpDOB.Value.ToString("yyyy-MM-dd"));
 
                         int count = Convert.ToInt32(checkCmd.ExecuteScalar());
@@ -469,20 +894,13 @@ namespace IM_Student_Record
                         }
                     }
 
-                    // Get next available Student ID
-                    int nextId = GetNextStudentID();
-
-                    // Convert name to database format: "First Name Middle Last Name"
-                    string databaseName = txtFullName.Text.Trim();  // Stores exactly as typed
-
-                    // Insert new student record with converted name format
                     string insertQuery = "INSERT INTO students (student_id, full_name, date_of_birth, gender, course, year_level, email, phone) " +
                                          "VALUES (@id, @name, @dob, @gender, @course, @year, @email, @phone)";
 
                     using (MySqlCommand cmd = new MySqlCommand(insertQuery, conn))
                     {
-                        cmd.Parameters.AddWithValue("@id", nextId);
-                        cmd.Parameters.AddWithValue("@name", databaseName);  // ← Stored in DB format
+                        cmd.Parameters.AddWithValue("@id", ConvertPUPToNumber(txtStudentID.Text.Trim()));
+                        cmd.Parameters.AddWithValue("@name", txtFullName.Text.Trim());
                         cmd.Parameters.AddWithValue("@dob", dtpDOB.Value.ToString("yyyy-MM-dd"));
                         cmd.Parameters.AddWithValue("@gender", cmbGender.Text);
                         cmd.Parameters.AddWithValue("@course", cmbCourse.Text);
@@ -492,9 +910,7 @@ namespace IM_Student_Record
 
                         cmd.ExecuteNonQuery();
 
-                        MessageBox.Show($"Student record added successfully!\n\n" +
-                                       $"Assigned Student ID: {nextId}\n" +
-                                       $"Name in Database: {databaseName}",
+                        MessageBox.Show($"Student record added successfully!\n\nStudent ID: {txtStudentID.Text}",
                             "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                         LoadGridData();
@@ -506,7 +922,7 @@ namespace IM_Student_Record
             {
                 if (ex.Number == 1062)
                 {
-                    MessageBox.Show("Student ID conflict! Please try again.", "Error",
+                    MessageBox.Show("Duplicate entry detected!", "Error",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 else
@@ -522,10 +938,16 @@ namespace IM_Student_Record
             }
         }
 
-        // ========== UPDATE BUTTON ==========
+        // UPDATE BUTTON
         private void btnUpdate_Click(object sender, EventArgs e)
         {
-            if (txtStudentID.Text == "Auto-generated" || txtStudentID.Text.StartsWith("Will be:") || string.IsNullOrWhiteSpace(txtStudentID.Text))
+            // Only here we show error messages
+            if (!ValidateAllFields(isUpdate: false))
+            {
+                return;  // Validation failed with message box
+            }
+
+            if (txtStudentID.Text == "2025-00126-SM-0" || string.IsNullOrWhiteSpace(txtStudentID.Text))
             {
                 MessageBox.Show("Please select a record to update from the table.",
                     "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -552,7 +974,7 @@ namespace IM_Student_Record
                 {
                     using (MySqlCommand cmd = new MySqlCommand(query, conn))
                     {
-                        cmd.Parameters.AddWithValue("@id", int.Parse(txtStudentID.Text));
+                        cmd.Parameters.AddWithValue("@id", ConvertPUPToNumber(txtStudentID.Text));
                         cmd.Parameters.AddWithValue("@name", txtFullName.Text.Trim());
                         cmd.Parameters.AddWithValue("@dob", dtpDOB.Value.ToString("yyyy-MM-dd"));
                         cmd.Parameters.AddWithValue("@gender", cmbGender.Text);
@@ -586,10 +1008,10 @@ namespace IM_Student_Record
             }
         }
 
-        // ========== DELETE BUTTON ==========
+        // DELETE BUTTON 
         private void btnDelete_Click(object sender, EventArgs e)
         {
-            if (txtStudentID.Text == "Auto-generated" || txtStudentID.Text.StartsWith("Will be:") || string.IsNullOrWhiteSpace(txtStudentID.Text))
+            if (txtStudentID.Text == "2025-00126-SM-0" || string.IsNullOrWhiteSpace(txtStudentID.Text))
             {
                 MessageBox.Show("Please select a record to delete from the table.",
                     "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -609,7 +1031,7 @@ namespace IM_Student_Record
                     {
                         using (MySqlCommand cmd = new MySqlCommand(query, conn))
                         {
-                            cmd.Parameters.AddWithValue("@id", int.Parse(txtStudentID.Text));
+                            cmd.Parameters.AddWithValue("@id", ConvertPUPToNumber(txtStudentID.Text));
 
                             conn.Open();
                             int rowsAffected = cmd.ExecuteNonQuery();
@@ -637,39 +1059,83 @@ namespace IM_Student_Record
             }
         }
 
-        // ========== REFRESH BUTTON ==========
+        // REFRESH BUTTON
         private void btnRefresh_Click(object sender, EventArgs e)
         {
             LoadGridData();
             ClearForm();
         }
 
-        // ========== DATA GRID VIEW SELECTION ==========
+        // ========== EVENT HANDLERS ==========
+
+        // DATA GRID VIEW SELECTION
         private void dgvStudents_SelectionChanged(object sender, EventArgs e)
         {
             if (dgvStudents.SelectedRows.Count > 0)
             {
                 DataGridViewRow row = dgvStudents.SelectedRows[0];
 
-                txtStudentID.Text = row.Cells["Student ID"].Value.ToString();
+                int studentIdNumber = Convert.ToInt32(row.Cells["Student ID"].Value);
+                txtStudentID.Text = ConvertNumberToPUP(studentIdNumber);
 
-                // Display exactly what's in the database
                 txtFullName.Text = row.Cells["Full Name"].Value.ToString();
-
                 dtpDOB.Value = Convert.ToDateTime(row.Cells["Date of Birth"].Value);
-                cmbGender.Text = row.Cells["Gender"].Value.ToString();
-                cmbCourse.Text = row.Cells["Course"].Value.ToString();
-                cmbYear.Text = row.Cells["Year"].Value.ToString();
+
+                string gender = row.Cells["Gender"].Value.ToString();
+                if (cmbGender.Items.Contains(gender))
+                {
+                    cmbGender.SelectedItem = gender;
+                    txtOthers.Visible = false;
+                }
+                else
+                {
+                    cmbGender.SelectedItem = "Others";
+                    txtOthers.Text = gender;
+                    txtOthers.Visible = true;
+                    lblOthers.Visible = true;
+                }
+
+                cmbCourse.SelectedItem = row.Cells["Course"].Value.ToString();
+                cmbYear.SelectedItem = row.Cells["Year"].Value.ToString();
+                cmbSection.SelectedItem = row.Cells["Section"].Value.ToString();  // ADD THIS
                 txtEmail.Text = row.Cells["Email"].Value.ToString();
                 mtbPhone.Text = row.Cells["Phone"].Value.ToString();
             }
         }
 
-        // ========== FORM LOAD ==========
+        // FORM LOAD 
         private void frmStudentRec_Load(object sender, EventArgs e)
         {
             LoadGridData();
             this.ShowIcon = false;       // Hides form icon mwehehehe
+        }
+
+        // wait a moment i'll organize this a bit more, it's a bit messy right now
+
+        private void CmbGender_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cmbGender.SelectedItem?.ToString() == "Others")
+            {
+                txtOthers.Visible = true;
+                lblOthers.Visible = true;
+                txtOthers.Focus();
+            }
+            else
+            {
+                txtOthers.Visible = false;
+                lblOthers.Visible = false;
+                txtOthers.Text = "";
+            }
+        }
+
+        private string GetGenderForDatabase()
+        {
+            string gender = cmbGender.SelectedItem?.ToString();
+            if (gender == "Others" && !string.IsNullOrWhiteSpace(txtOthers.Text))
+            {
+                return txtOthers.Text.Trim();
+            }
+            return gender;
         }
 
     }

@@ -15,9 +15,10 @@
 
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+            components = new System.ComponentModel.Container();
+            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
             txtStudentID = new TextBox();
             txtFullName = new TextBox();
             dtpDOB = new DateTimePicker();
@@ -46,6 +47,9 @@
             lblSection = new Label();
             label1 = new Label();
             label2 = new Label();
+            toolTip1 = new ToolTip(components);
+            lblOthers = new Label();
+            txtOthers = new TextBox();
             ((System.ComponentModel.ISupportInitialize)dgvStudents).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pbSRS).BeginInit();
             panel1.SuspendLayout();
@@ -83,7 +87,7 @@
             cmbGender.Items.AddRange(new object[] { "Male", "Female", "Other" });
             cmbGender.Location = new Point(124, 181);
             cmbGender.Name = "cmbGender";
-            cmbGender.Size = new Size(411, 29);
+            cmbGender.Size = new Size(116, 29);
             cmbGender.TabIndex = 4;
             // 
             // cmbCourse
@@ -120,31 +124,31 @@
             dgvStudents.AllowUserToDeleteRows = false;
             dgvStudents.AllowUserToResizeColumns = false;
             dgvStudents.AllowUserToResizeRows = false;
-            dataGridViewCellStyle1.BackColor = Color.GhostWhite;
-            dgvStudents.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle4.BackColor = Color.GhostWhite;
+            dgvStudents.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle4;
             dgvStudents.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dgvStudents.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvStudents.BackgroundColor = Color.White;
             dgvStudents.BorderStyle = BorderStyle.None;
             dgvStudents.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle2.BackColor = Color.SteelBlue;
-            dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle2.ForeColor = Color.White;
-            dataGridViewCellStyle2.SelectionBackColor = Color.SteelBlue;
-            dataGridViewCellStyle2.SelectionForeColor = Color.White;
-            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
-            dgvStudents.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle5.BackColor = Color.SteelBlue;
+            dataGridViewCellStyle5.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle5.ForeColor = Color.White;
+            dataGridViewCellStyle5.SelectionBackColor = Color.SteelBlue;
+            dataGridViewCellStyle5.SelectionForeColor = Color.White;
+            dataGridViewCellStyle5.WrapMode = DataGridViewTriState.True;
+            dgvStudents.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
             dgvStudents.ColumnHeadersHeight = 40;
-            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = Color.White;
-            dataGridViewCellStyle3.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle3.ForeColor = SystemColors.ControlText;
-            dataGridViewCellStyle3.Padding = new Padding(5);
-            dataGridViewCellStyle3.SelectionBackColor = Color.LightSteelBlue;
-            dataGridViewCellStyle3.SelectionForeColor = Color.Black;
-            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.False;
-            dgvStudents.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle6.BackColor = Color.White;
+            dataGridViewCellStyle6.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle6.ForeColor = SystemColors.ControlText;
+            dataGridViewCellStyle6.Padding = new Padding(5);
+            dataGridViewCellStyle6.SelectionBackColor = Color.LightSteelBlue;
+            dataGridViewCellStyle6.SelectionForeColor = Color.Black;
+            dataGridViewCellStyle6.WrapMode = DataGridViewTriState.False;
+            dgvStudents.DefaultCellStyle = dataGridViewCellStyle6;
             dgvStudents.EnableHeadersVisualStyles = false;
             dgvStudents.GridColor = Color.Gainsboro;
             dgvStudents.Location = new Point(12, 411);
@@ -354,6 +358,8 @@
             panel1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             panel1.BackColor = Color.White;
             panel1.BorderStyle = BorderStyle.FixedSingle;
+            panel1.Controls.Add(txtOthers);
+            panel1.Controls.Add(lblOthers);
             panel1.Controls.Add(cmbSection);
             panel1.Controls.Add(lblSection);
             panel1.Controls.Add(lblStudentID);
@@ -424,6 +430,25 @@
             label2.TabIndex = 27;
             label2.Text = "Manages student records (Create, Read, Update, Delete)";
             // 
+            // lblOthers
+            // 
+            lblOthers.AutoSize = true;
+            lblOthers.Font = new Font("Segoe UI", 9.75F, FontStyle.Italic, GraphicsUnit.Point, 0);
+            lblOthers.ForeColor = Color.SteelBlue;
+            lblOthers.Location = new Point(246, 187);
+            lblOthers.Name = "lblOthers";
+            lblOthers.Size = new Size(138, 17);
+            lblOthers.TabIndex = 30;
+            lblOthers.Text = "If others, please specify:";
+            // 
+            // txtOthers
+            // 
+            txtOthers.Font = new Font("Segoe UI", 12F);
+            txtOthers.Location = new Point(390, 181);
+            txtOthers.Name = "txtOthers";
+            txtOthers.Size = new Size(145, 29);
+            txtOthers.TabIndex = 31;
+            // 
             // frmStudentRec
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -481,5 +506,8 @@
         private Label label2;
         private ComboBox cmbSection;
         private Label lblSection;
+        private ToolTip toolTip1;
+        private TextBox txtOthers;
+        private Label lblOthers;
     }
 }
