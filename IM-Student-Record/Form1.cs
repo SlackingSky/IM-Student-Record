@@ -97,10 +97,6 @@ namespace IM_Student_Record
 
             // Setup real-time visual validation (no message boxes)
             SetupRealTimeValidation();
-
-            // Hide "Others" textbox initially
-            txtOthers.Visible = false;
-            lblOthers.Visible = false;
         }
 
         // ========== PLACEHOLDER, TOOLTIP, & COMBOBOX SETUP METHODS ==========
@@ -624,27 +620,6 @@ namespace IM_Student_Record
                 cmbGender.Focus();
                 return false;
             }
-
-            // If "Others" is selected, check if textbox is filled
-            if (cmbGender.SelectedItem?.ToString() == "Others")
-            {
-                if (string.IsNullOrWhiteSpace(txtOthers.Text))
-                {
-                    MessageBox.Show("Please specify your gender!", "Validation Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    txtOthers.Focus();
-                    return false;
-                }
-                // pa-change na lang please kapag na edit na yung varchar limit sa database thanks
-                if (txtOthers.Text.Length > 8)
-                {
-                    MessageBox.Show("Gender specification too long (max 8 chars)!", "Validation Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    txtOthers.Focus();
-                    return false;
-                }
-            }
-
             return true;
         }
 
@@ -819,11 +794,6 @@ namespace IM_Student_Record
             cmbCourse.SelectedIndex = 0;    // "-- Select Course --"
             cmbYear.SelectedIndex = 0;      // "-- Select Year --"
             cmbSection.SelectedIndex = 0;   // "-- Select Section --" (NEW)
-
-            // Hide "Others" textbox
-            txtOthers.Visible = false;
-            txtOthers.Text = "";
-            lblOthers.Visible = false;
 
             // Reset DatePicker
             dtpDOB.Value = DateTime.Now.AddYears(-18);
@@ -1090,20 +1060,7 @@ namespace IM_Student_Record
                 txtFullName.Text = row.Cells["Full Name"].Value.ToString();
                 dtpDOB.Value = Convert.ToDateTime(row.Cells["Date of Birth"].Value);
 
-                string gender = row.Cells["Gender"].Value.ToString();
-                if (cmbGender.Items.Contains(gender))
-                {
-                    cmbGender.SelectedItem = gender;
-                    txtOthers.Visible = false;
-                }
-                else
-                {
-                    cmbGender.SelectedItem = "Others";
-                    txtOthers.Text = gender;
-                    txtOthers.Visible = true;
-                    lblOthers.Visible = true;
-                }
-
+                cmbGender.Text = row.Cells["Gender"].Value.ToString();
                 cmbCourse.SelectedItem = row.Cells["Course"].Value.ToString();
                 cmbYear.SelectedItem = row.Cells["Year"].Value.ToString();
                 cmbSection.SelectedItem = row.Cells["Section"].Value.ToString();  // ADD THIS
@@ -1115,8 +1072,7 @@ namespace IM_Student_Record
         // FORM LOAD 
         private async void frmStudentRec_Load(object sender, EventArgs e)
         {
-            await LoadGridData();
-            this.ShowIcon = false;
+            
         }
 
         // wait a moment i'll organize this a bit more, it's a bit messy right now

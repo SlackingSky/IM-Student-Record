@@ -44,8 +44,6 @@
             pbSRS = new PictureBox();
             lblSRS = new Label();
             panel1 = new Panel();
-            txtOthers = new TextBox();
-            lblOthers = new Label();
             cmbSection = new ComboBox();
             lblSection = new Label();
             label1 = new Label();
@@ -59,7 +57,7 @@
             // txtStudentID
             // 
             txtStudentID.Font = new Font("Segoe UI", 12F);
-            txtStudentID.Location = new Point(124, 53);
+            txtStudentID.Location = new Point(163, 53);
             txtStudentID.Name = "txtStudentID";
             txtStudentID.Size = new Size(411, 29);
             txtStudentID.TabIndex = 1;
@@ -67,7 +65,7 @@
             // txtFullName
             // 
             txtFullName.Font = new Font("Segoe UI", 12F);
-            txtFullName.Location = new Point(124, 94);
+            txtFullName.Location = new Point(163, 94);
             txtFullName.Name = "txtFullName";
             txtFullName.Size = new Size(411, 29);
             txtFullName.TabIndex = 3;
@@ -76,7 +74,7 @@
             // 
             dtpDOB.Font = new Font("Segoe UI", 12F);
             dtpDOB.Format = DateTimePickerFormat.Short;
-            dtpDOB.Location = new Point(124, 138);
+            dtpDOB.Location = new Point(163, 138);
             dtpDOB.Name = "dtpDOB";
             dtpDOB.Size = new Size(411, 29);
             dtpDOB.TabIndex = 6;
@@ -85,10 +83,10 @@
             // 
             cmbGender.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbGender.Font = new Font("Segoe UI", 12F);
-            cmbGender.Items.AddRange(new object[] { "Male", "Female", "Other" });
-            cmbGender.Location = new Point(124, 181);
+            cmbGender.Items.AddRange(new object[] { "Male", "Female", "Non-Binary" });
+            cmbGender.Location = new Point(163, 181);
             cmbGender.Name = "cmbGender";
-            cmbGender.Size = new Size(116, 29);
+            cmbGender.Size = new Size(199, 29);
             cmbGender.TabIndex = 4;
             // 
             // cmbCourse
@@ -96,9 +94,9 @@
             cmbCourse.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbCourse.Font = new Font("Segoe UI", 12F);
             cmbCourse.Items.AddRange(new object[] { "Bachelor of Science in Accountancy", "Bachelor of Science in Computer Engineering", "Bachelor of Science in Entrepreneurship", "Bachelor of Science in Hospitality Management", "Bachelor of Science in Information Technology", "Bachelor of Secondary Education major in English", "Bachelor of Secondary Education major in Mathematics", "Diploma in Office Management Technology with Specialization in Legal Office Management " });
-            cmbCourse.Location = new Point(658, 55);
+            cmbCourse.Location = new Point(697, 55);
             cmbCourse.Name = "cmbCourse";
-            cmbCourse.Size = new Size(346, 29);
+            cmbCourse.Size = new Size(431, 29);
             cmbCourse.TabIndex = 2;
             // 
             // cmbYear
@@ -106,15 +104,15 @@
             cmbYear.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbYear.Font = new Font("Segoe UI", 12F);
             cmbYear.Items.AddRange(new object[] { "1", "2", "3", "4" });
-            cmbYear.Location = new Point(658, 96);
+            cmbYear.Location = new Point(697, 96);
             cmbYear.Name = "cmbYear";
-            cmbYear.Size = new Size(129, 29);
+            cmbYear.Size = new Size(160, 29);
             cmbYear.TabIndex = 5;
             // 
             // txtEmail
             // 
             txtEmail.Font = new Font("Segoe UI", 12F);
-            txtEmail.Location = new Point(658, 138);
+            txtEmail.Location = new Point(697, 138);
             txtEmail.Name = "txtEmail";
             txtEmail.Size = new Size(346, 29);
             txtEmail.TabIndex = 7;
@@ -159,7 +157,7 @@
             dgvStudents.RowHeadersVisible = false;
             dgvStudents.RowTemplate.Height = 35;
             dgvStudents.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvStudents.Size = new Size(1022, 263);
+            dgvStudents.Size = new Size(1184, 263);
             dgvStudents.TabIndex = 9;
             dgvStudents.SelectionChanged += dgvStudents_SelectionChanged;
             // 
@@ -170,7 +168,7 @@
             btnAdd.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
             btnAdd.ForeColor = Color.White;
             btnAdd.Image = Properties.Resources.plus_8_16;
-            btnAdd.Location = new Point(788, 6);
+            btnAdd.Location = new Point(950, 6);
             btnAdd.Name = "btnAdd";
             btnAdd.Size = new Size(218, 35);
             btnAdd.TabIndex = 10;
@@ -190,7 +188,7 @@
             btnUpdate.ForeColor = Color.White;
             btnUpdate.Image = Properties.Resources.edit_property_16__1_;
             btnUpdate.ImageAlign = ContentAlignment.MiddleRight;
-            btnUpdate.Location = new Point(705, 370);
+            btnUpdate.Location = new Point(852, 370);
             btnUpdate.Name = "btnUpdate";
             btnUpdate.Size = new Size(186, 35);
             btnUpdate.TabIndex = 12;
@@ -223,7 +221,7 @@
             btnRefresh.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
             btnRefresh.ForeColor = Color.SteelBlue;
             btnRefresh.Image = Properties.Resources.sinchronize_16;
-            btnRefresh.Location = new Point(897, 370);
+            btnRefresh.Location = new Point(1059, 370);
             btnRefresh.Name = "btnRefresh";
             btnRefresh.Size = new Size(137, 35);
             btnRefresh.TabIndex = 13;
@@ -238,7 +236,7 @@
             lblStudentID.AutoSize = true;
             lblStudentID.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold);
             lblStudentID.ForeColor = Color.SteelBlue;
-            lblStudentID.Location = new Point(12, 58);
+            lblStudentID.Location = new Point(51, 58);
             lblStudentID.Name = "lblStudentID";
             lblStudentID.Size = new Size(92, 21);
             lblStudentID.TabIndex = 21;
@@ -249,7 +247,7 @@
             lblFullName.AutoSize = true;
             lblFullName.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold);
             lblFullName.ForeColor = Color.SteelBlue;
-            lblFullName.Location = new Point(11, 99);
+            lblFullName.Location = new Point(50, 99);
             lblFullName.Name = "lblFullName";
             lblFullName.Size = new Size(86, 21);
             lblFullName.TabIndex = 20;
@@ -260,7 +258,7 @@
             lblDOB.AutoSize = true;
             lblDOB.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold);
             lblDOB.ForeColor = Color.SteelBlue;
-            lblDOB.Location = new Point(12, 141);
+            lblDOB.Location = new Point(51, 141);
             lblDOB.Name = "lblDOB";
             lblDOB.Size = new Size(107, 21);
             lblDOB.TabIndex = 19;
@@ -272,7 +270,7 @@
             lblGender.AutoSize = true;
             lblGender.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold);
             lblGender.ForeColor = Color.SteelBlue;
-            lblGender.Location = new Point(12, 184);
+            lblGender.Location = new Point(51, 184);
             lblGender.Name = "lblGender";
             lblGender.Size = new Size(69, 21);
             lblGender.TabIndex = 18;
@@ -283,7 +281,7 @@
             lblCourse.AutoSize = true;
             lblCourse.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold);
             lblCourse.ForeColor = Color.SteelBlue;
-            lblCourse.Location = new Point(559, 58);
+            lblCourse.Location = new Point(598, 58);
             lblCourse.Name = "lblCourse";
             lblCourse.Size = new Size(65, 21);
             lblCourse.TabIndex = 17;
@@ -294,7 +292,7 @@
             lblYear.AutoSize = true;
             lblYear.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold);
             lblYear.ForeColor = Color.SteelBlue;
-            lblYear.Location = new Point(559, 99);
+            lblYear.Location = new Point(598, 99);
             lblYear.Name = "lblYear";
             lblYear.Size = new Size(87, 21);
             lblYear.TabIndex = 16;
@@ -305,7 +303,7 @@
             lblEmail.AutoSize = true;
             lblEmail.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold);
             lblEmail.ForeColor = Color.SteelBlue;
-            lblEmail.Location = new Point(559, 141);
+            lblEmail.Location = new Point(598, 141);
             lblEmail.Name = "lblEmail";
             lblEmail.Size = new Size(52, 21);
             lblEmail.TabIndex = 15;
@@ -316,7 +314,7 @@
             lblPhone.AutoSize = true;
             lblPhone.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold);
             lblPhone.ForeColor = Color.SteelBlue;
-            lblPhone.Location = new Point(559, 184);
+            lblPhone.Location = new Point(598, 184);
             lblPhone.Name = "lblPhone";
             lblPhone.Size = new Size(60, 21);
             lblPhone.TabIndex = 14;
@@ -325,7 +323,7 @@
             // mtbPhone
             // 
             mtbPhone.Font = new Font("Segoe UI", 12F);
-            mtbPhone.Location = new Point(658, 181);
+            mtbPhone.Location = new Point(697, 181);
             mtbPhone.Mask = "(+63)000-000-0000";
             mtbPhone.Name = "mtbPhone";
             mtbPhone.PromptChar = ' ';
@@ -359,8 +357,6 @@
             panel1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             panel1.BackColor = Color.White;
             panel1.BorderStyle = BorderStyle.FixedSingle;
-            panel1.Controls.Add(txtOthers);
-            panel1.Controls.Add(lblOthers);
             panel1.Controls.Add(cmbSection);
             panel1.Controls.Add(lblSection);
             panel1.Controls.Add(lblStudentID);
@@ -385,36 +381,17 @@
             panel1.ForeColor = Color.SteelBlue;
             panel1.Location = new Point(12, 105);
             panel1.Name = "panel1";
-            panel1.Size = new Size(1022, 247);
+            panel1.Size = new Size(1184, 247);
             panel1.TabIndex = 26;
-            // 
-            // txtOthers
-            // 
-            txtOthers.Font = new Font("Segoe UI", 12F);
-            txtOthers.Location = new Point(390, 181);
-            txtOthers.Name = "txtOthers";
-            txtOthers.Size = new Size(145, 29);
-            txtOthers.TabIndex = 31;
-            // 
-            // lblOthers
-            // 
-            lblOthers.AutoSize = true;
-            lblOthers.Font = new Font("Segoe UI", 9.75F, FontStyle.Italic, GraphicsUnit.Point, 0);
-            lblOthers.ForeColor = Color.SteelBlue;
-            lblOthers.Location = new Point(246, 187);
-            lblOthers.Name = "lblOthers";
-            lblOthers.Size = new Size(138, 17);
-            lblOthers.TabIndex = 30;
-            lblOthers.Text = "If others, please specify:";
             // 
             // cmbSection
             // 
             cmbSection.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbSection.Font = new Font("Segoe UI", 12F);
             cmbSection.Items.AddRange(new object[] { "1", "2", "3", "4" });
-            cmbSection.Location = new Point(874, 96);
+            cmbSection.Location = new Point(966, 96);
             cmbSection.Name = "cmbSection";
-            cmbSection.Size = new Size(129, 29);
+            cmbSection.Size = new Size(160, 29);
             cmbSection.TabIndex = 28;
             // 
             // lblSection
@@ -422,7 +399,7 @@
             lblSection.AutoSize = true;
             lblSection.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold);
             lblSection.ForeColor = Color.SteelBlue;
-            lblSection.Location = new Point(799, 99);
+            lblSection.Location = new Point(891, 99);
             lblSection.Name = "lblSection";
             lblSection.Size = new Size(69, 21);
             lblSection.TabIndex = 29;
@@ -455,7 +432,7 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.AliceBlue;
-            ClientSize = new Size(1046, 686);
+            ClientSize = new Size(1208, 686);
             Controls.Add(label2);
             Controls.Add(panel1);
             Controls.Add(lblSRS);
@@ -510,7 +487,5 @@
         private ComboBox cmbSection;
         private Label lblSection;
         private ToolTip toolTip1;
-        private TextBox txtOthers;
-        private Label lblOthers;
     }
 }
