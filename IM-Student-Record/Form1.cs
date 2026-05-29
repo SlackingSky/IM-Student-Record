@@ -31,7 +31,6 @@ namespace IM_Student_Record
             InitializeComponent();
 
             // Disable form resizing
-            this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;  // Optional: disables maximize button
             this.MinimizeBox = true;   // Keep minimize button enabled
 
