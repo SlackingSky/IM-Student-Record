@@ -298,7 +298,7 @@ namespace IM_Student_Record
         }
 
         // ========== CHECK DUPLICATES (Email and Phone) ==========
-        private bool IsEmailDuplicate(string email, int? excludeStudentId = null)
+        private bool IsEmailDuplicate(string email, string? excludeStudentId = null)
         {
             try
             {
@@ -306,7 +306,7 @@ namespace IM_Student_Record
                 {
                     conn.Open();
                     string query = "SELECT COUNT(*) FROM students WHERE email = @email";
-                    if (excludeStudentId.HasValue)
+                    if (excludeStudentId != null)
                     {
                         query += " AND student_id != @studentId";
                     }
@@ -314,9 +314,9 @@ namespace IM_Student_Record
                     using (MySqlCommand cmd = new MySqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@email", email.Trim().ToLower());
-                        if (excludeStudentId.HasValue)
+                        if (excludeStudentId != null)
                         {
-                            cmd.Parameters.AddWithValue("@studentId", excludeStudentId.Value);
+                            cmd.Parameters.AddWithValue("@studentId", excludeStudentId);
                         }
 
                         int count = Convert.ToInt32(cmd.ExecuteScalar());
@@ -330,7 +330,7 @@ namespace IM_Student_Record
             }
         }
 
-        private bool IsPhoneDuplicate(string phone, int? excludeStudentId = null)
+        private bool IsPhoneDuplicate(string phone, string? excludeStudentId = null)
         {
             try
             {
@@ -338,7 +338,7 @@ namespace IM_Student_Record
                 {
                     conn.Open();
                     string query = "SELECT COUNT(*) FROM students WHERE phone = @phone";
-                    if (excludeStudentId.HasValue)
+                    if (excludeStudentId != null)
                     {
                         query += " AND student_id != @studentId";
                     }
@@ -346,9 +346,9 @@ namespace IM_Student_Record
                     using (MySqlCommand cmd = new MySqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@phone", phone.Trim());
-                        if (excludeStudentId.HasValue)
+                        if (excludeStudentId != null)
                         {
-                            cmd.Parameters.AddWithValue("@studentId", excludeStudentId.Value);
+                            cmd.Parameters.AddWithValue("@studentId", excludeStudentId);
                         }
 
                         int count = Convert.ToInt32(cmd.ExecuteScalar());
@@ -713,9 +713,9 @@ namespace IM_Student_Record
             }
 
             // Check for duplicate email (skip during update if it's the same student)
-            int? excludeId = isUpdate && !string.IsNullOrWhiteSpace(txtStudentID.Text) && txtStudentID.Text != "2025-00126-SM-0"
-                ? ConvertPUPToNumber(txtStudentID.Text)
-                : (int?)null;
+            string? excludeId = isUpdate && !string.IsNullOrWhiteSpace(txtStudentID.Text) && txtStudentID.Text != "2025-00126-SM-0"
+                ? txtStudentID.Text
+                : null;
 
             if (IsEmailDuplicate(email, excludeId))
             {
@@ -760,9 +760,9 @@ namespace IM_Student_Record
             }
 
             // Check for duplicate phone number
-            int? excludeId = isUpdate && !string.IsNullOrWhiteSpace(txtStudentID.Text) && txtStudentID.Text != "2025-00126-SM-0"
-            ? ConvertPUPToNumber(txtStudentID.Text)
-            : (int?)null;
+            string? excludeId = isUpdate && !string.IsNullOrWhiteSpace(txtStudentID.Text) && txtStudentID.Text != "2025-00126-SM-0"
+            ? txtStudentID.Text
+            : null;
 
             if (IsPhoneDuplicate(mtbPhone.Text.Trim(), excludeId))
             {
@@ -866,7 +866,7 @@ namespace IM_Student_Record
                     string checkIdQuery = "SELECT COUNT(*) FROM students WHERE student_id = @id";
                     using (MySqlCommand checkCmd = new MySqlCommand(checkIdQuery, conn))
                     {
-                        int studentIdNumber = ConvertPUPToNumber(txtStudentID.Text.Trim());
+                        string studentIdNumber = txtStudentID.Text.Trim();
                         checkCmd.Parameters.AddWithValue("@id", studentIdNumber);
 
                         int count = Convert.ToInt32(checkCmd.ExecuteScalar());
@@ -894,17 +894,18 @@ namespace IM_Student_Record
                         }
                     }
 
-                    string insertQuery = "INSERT INTO students (student_id, full_name, date_of_birth, gender, course, year_level, email, phone) " +
-                                         "VALUES (@id, @name, @dob, @gender, @course, @year, @email, @phone)";
+                    string insertQuery = "INSERT INTO students (student_id, full_name, date_of_birth, gender, course, year_level, section, email, phone) " +
+                                         "VALUES (@id, @name, @dob, @gender, @course, @year, @section, @email, @phone)";
 
                     using (MySqlCommand cmd = new MySqlCommand(insertQuery, conn))
                     {
-                        cmd.Parameters.AddWithValue("@id", ConvertPUPToNumber(txtStudentID.Text.Trim()));
+                        cmd.Parameters.AddWithValue("@id", txtStudentID.Text.Trim());
                         cmd.Parameters.AddWithValue("@name", txtFullName.Text.Trim());
                         cmd.Parameters.AddWithValue("@dob", dtpDOB.Value.ToString("yyyy-MM-dd"));
                         cmd.Parameters.AddWithValue("@gender", cmbGender.Text);
                         cmd.Parameters.AddWithValue("@course", cmbCourse.Text);
                         cmd.Parameters.AddWithValue("@year", int.Parse(cmbYear.Text));
+                        cmd.Parameters.AddWithValue("@section", int.Parse(cmbSection.Text));
                         cmd.Parameters.AddWithValue("@email", txtEmail.Text.Trim().ToLower());
                         cmd.Parameters.AddWithValue("@phone", mtbPhone.Text);
 
@@ -974,7 +975,7 @@ namespace IM_Student_Record
                 {
                     using (MySqlCommand cmd = new MySqlCommand(query, conn))
                     {
-                        cmd.Parameters.AddWithValue("@id", ConvertPUPToNumber(txtStudentID.Text));
+                        cmd.Parameters.AddWithValue("@id", txtStudentID.Text);
                         cmd.Parameters.AddWithValue("@name", txtFullName.Text.Trim());
                         cmd.Parameters.AddWithValue("@dob", dtpDOB.Value.ToString("yyyy-MM-dd"));
                         cmd.Parameters.AddWithValue("@gender", cmbGender.Text);
@@ -1031,7 +1032,7 @@ namespace IM_Student_Record
                     {
                         using (MySqlCommand cmd = new MySqlCommand(query, conn))
                         {
-                            cmd.Parameters.AddWithValue("@id", ConvertPUPToNumber(txtStudentID.Text));
+                            cmd.Parameters.AddWithValue("@id", txtStudentID.Text);
 
                             conn.Open();
                             int rowsAffected = cmd.ExecuteNonQuery();
@@ -1075,8 +1076,8 @@ namespace IM_Student_Record
             {
                 DataGridViewRow row = dgvStudents.SelectedRows[0];
 
-                int studentIdNumber = Convert.ToInt32(row.Cells["Student ID"].Value);
-                txtStudentID.Text = ConvertNumberToPUP(studentIdNumber);
+                string studentIdNumber = Convert.ToString(row.Cells["Student ID"].Value);
+                txtStudentID.Text = studentIdNumber; //ConvertNumberToPUP(studentIdNumber); Not needed anymore
 
                 txtFullName.Text = row.Cells["Full Name"].Value.ToString();
                 dtpDOB.Value = Convert.ToDateTime(row.Cells["Date of Birth"].Value);
