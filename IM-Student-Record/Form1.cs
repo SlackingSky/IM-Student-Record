@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.Devices;
 using MySqlConnector;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -23,6 +24,7 @@ namespace IM_Student_Record
     public partial class frmStudentRec : Form
     {
         private readonly string connString = dbconnector.GetConnectionString();
+        private static int? studentID;
 
         public frmStudentRec()
         {
@@ -34,7 +36,6 @@ namespace IM_Student_Record
             this.MinimizeBox = true;   // Keep minimize button enabled
 
             SetupForm();
-            LoadGridData();
             ClearForm();
             ClearSelection();
 
@@ -97,43 +98,19 @@ namespace IM_Student_Record
 
             // Setup real-time visual validation (no message boxes)
             SetupRealTimeValidation();
-
-            // Hide "Others" textbox initially
-            txtOthers.Visible = false;
-            lblOthers.Visible = false;
         }
 
         // ========== PLACEHOLDER, TOOLTIP, & COMBOBOX SETUP METHODS ==========
         private void SetupPlaceholders()
         {
-            SetPlaceholder(txtStudentID, "2025-00126-SM-0");
-            SetPlaceholder(txtFullName, "Dela Cruz, Juan M.");
-            SetPlaceholder(txtEmail, "juandelacruz@iskolarngbayan.pup.edu.ph");
+            SetPlaceholder(txtStudentID, "e.g., 2025-00126-SM-0");
+            SetPlaceholder(txtFullName, "e.g., Dela Cruz, Juan M.");
+            SetPlaceholder(txtEmail, "e.g., juandelacruz@iskolarngbayan.pup.edu.ph");
         }
 
         private void SetPlaceholder(TextBox textBox, string placeholderText)
         {
-            textBox.Tag = placeholderText;
-            textBox.Text = placeholderText;
-            textBox.ForeColor = Color.Gray;
-
-            textBox.Enter += (s, e) =>
-            {
-                if (textBox.Text == placeholderText)
-                {
-                    textBox.Text = "";
-                    textBox.ForeColor = Color.Black;
-                }
-            };
-
-            textBox.Leave += (s, e) =>
-            {
-                if (string.IsNullOrWhiteSpace(textBox.Text))
-                {
-                    textBox.Text = placeholderText;
-                    textBox.ForeColor = Color.Gray;
-                }
-            };
+            textBox.PlaceholderText = placeholderText;
         }
 
         private void SetupEmailWithTooltip()
@@ -298,7 +275,7 @@ namespace IM_Student_Record
         }
 
         // ========== CHECK DUPLICATES (Email and Phone) ==========
-        private async Task<bool> IsEmailDuplicate(string email, string? excludeStudentId = null)
+        private async Task<bool> IsEmailDuplicate(string email, int? excemptStudentID)
         {
             try
             {
@@ -306,7 +283,7 @@ namespace IM_Student_Record
                 {
                     await conn.OpenAsync();
                     string query = "SELECT COUNT(*) FROM students WHERE email = @email";
-                    if (excludeStudentId != null)
+                    if (excemptStudentID.HasValue)
                     {
                         query += " AND student_id != @studentId";
                     }
@@ -314,9 +291,9 @@ namespace IM_Student_Record
                     using (MySqlCommand cmd = new MySqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@email", email.Trim().ToLower());
-                        if (excludeStudentId != null)
+                        if (excemptStudentID.HasValue != null)
                         {
-                            cmd.Parameters.AddWithValue("@studentId", excludeStudentId);
+                            cmd.Parameters.AddWithValue("@studentId", excemptStudentID);
                         }
 
                         object? result = await cmd.ExecuteScalarAsync();
@@ -331,7 +308,7 @@ namespace IM_Student_Record
             }
         }
 
-        private async Task<bool> IsPhoneDuplicate(string phone, string? excludeStudentId = null)
+        private async Task<bool> IsPhoneDuplicate(string phone, int? excemptStudentID)
         {
             try
             {
@@ -339,7 +316,7 @@ namespace IM_Student_Record
                 {
                     await conn.OpenAsync();
                     string query = "SELECT COUNT(*) FROM students WHERE phone = @phone";
-                    if (excludeStudentId != null)
+                    if (excemptStudentID.HasValue)
                     {
                         query += " AND student_id != @studentId";
                     }
@@ -347,9 +324,9 @@ namespace IM_Student_Record
                     using (MySqlCommand cmd = new MySqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@phone", phone.Trim());
-                        if (excludeStudentId != null)
+                        if (excemptStudentID.HasValue)
                         {
-                            cmd.Parameters.AddWithValue("@studentId", excludeStudentId);
+                            cmd.Parameters.AddWithValue("@studentId", excemptStudentID);
                         }
 
                         object? result = await cmd.ExecuteScalarAsync();
@@ -373,7 +350,7 @@ namespace IM_Student_Record
                 {
                     await conn.OpenAsync();
                     // updated the query to include section
-                    string query = "SELECT student_id AS 'Student ID', full_name AS 'Full Name', " +
+                    string query = "SELECT student_id, student_number AS 'Student Number', full_name AS 'Full Name', " +
                                    "date_of_birth AS 'Date of Birth', gender AS 'Gender', " +
                                    "course AS 'Course', year_level AS 'Year', section AS 'Section', " +  // ADD THIS
                                    "email AS 'Email', phone AS 'Phone' FROM students ORDER BY student_id";
@@ -382,12 +359,18 @@ namespace IM_Student_Record
                     {
                         using (var reader = await cmd.ExecuteReaderAsync())
                         {
+                            dgvStudents.SelectionChanged -= dgvStudents_SelectionChanged;
                             DataTable dt = new DataTable();
                             dt.Load(reader);
                             dgvStudents.DataSource = dt;
+                            if (dgvStudents.Columns["student_id"] != null)
+                            {
+                                dgvStudents.Columns["student_id"].Visible = false;
+                            }
 
                             // Clear any selection after loading data
                             ClearSelection();
+                            dgvStudents.SelectionChanged += dgvStudents_SelectionChanged;
                         }
                     }
                 }
@@ -549,6 +532,53 @@ namespace IM_Student_Record
 
             return true;
         }
+        private bool IsNameInValid(string fullName)
+        {
+            string[] separatedName = fullName.Split(' ');
+            if (fullName.Any(char.IsDigit))
+            {
+                return true;
+            }
+
+            if (!fullName.Contains(','))
+            {
+                return true;
+            }
+
+            if (fullName.Count() < 5)
+            {
+                return true;
+            }
+
+            foreach (string s in separatedName)
+            {
+                if (s.Count() < 2 && !s.IsWhiteSpace())
+                {
+                    return true;
+                }
+            }
+
+            // Invalid symbol checker
+            if (!Regex.IsMatch(fullName, @"^[a-zA-Z\s,\.\-]+$"))
+            {
+                return true;
+            }
+
+            // Repeating character checker
+            if (Regex.IsMatch(fullName, @"(.)\1{3,}"))
+            {
+                return true;
+            }
+
+            // Spam checker
+            if (Regex.IsMatch(fullName, @"(?i)[bcdfghjklmnpqrstvwxz]{6,}"))
+            {
+                return true;
+            }
+
+            // If it passes all tests, it looks like a real name
+            return false;
+        }
 
         private bool ValidateFullName()
         {
@@ -561,24 +591,21 @@ namespace IM_Student_Record
                 return false;
             }
 
-            string fullName = txtFullName.Text.Trim();
-
-            if (!fullName.Contains(","))
+            if (IsNameInValid(txtFullName.Text.Trim()))
             {
                 MessageBox.Show(
-                    "Invalid Name Format!\n\n" +
-                    "Please use this format: Last Name, First Name\n\n" +
-                    "Examples:\n" +
-                    "✓ Gonzales III, Pedro B.\n" +
-                    "✓ Santos, Maria C.\n" +
-                    "✓ Dela Cruz, Juan M.\n" +
-                    "✓ Sarmiento, Sharlynne Jemima",
-                    "Validation Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                "Invalid Name Format!\n\n" +
+                "Please use this format: Last Name, First Name Middle Initial optional\n\n" +
+                "Examples:\n" +
+                "✓ Gonzales III, Pedro B.\n" +
+                "✓ Santos, Maria C.\n" +
+                "✓ Dela Cruz, Juan M.\n" +
+                "✓ Sarmiento, Sharlynne Jemima",
+                "Validation Error",
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtFullName.Focus();
                 return false;
             }
-
             return true;
         }
 
@@ -623,26 +650,6 @@ namespace IM_Student_Record
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 cmbGender.Focus();
                 return false;
-            }
-
-            // If "Others" is selected, check if textbox is filled
-            if (cmbGender.SelectedItem?.ToString() == "Others")
-            {
-                if (string.IsNullOrWhiteSpace(txtOthers.Text))
-                {
-                    MessageBox.Show("Please specify your gender!", "Validation Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    txtOthers.Focus();
-                    return false;
-                }
-                // pa-change na lang please kapag na edit na yung varchar limit sa database thanks
-                if (txtOthers.Text.Length > 8)
-                {
-                    MessageBox.Show("Gender specification too long (max 8 chars)!", "Validation Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    txtOthers.Focus();
-                    return false;
-                }
             }
 
             return true;
@@ -698,6 +705,17 @@ namespace IM_Student_Record
 
             string email = txtEmail.Text.Trim().ToLower();
 
+            // Self explanatory naman, checks email pattern, prevents g@com
+            string emailPattern = @"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$";
+
+            if (!System.Text.RegularExpressions.Regex.IsMatch(email, emailPattern))
+            {
+                MessageBox.Show("Please enter a valid email address!\n\nExample: student@domain.com",
+                    "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtEmail.Focus();
+                return false;
+            }
+
             try
             {
                 var addr = new System.Net.Mail.MailAddress(email);
@@ -717,13 +735,13 @@ namespace IM_Student_Record
                 return false;
             }
 
+            int? excemptedId = isUpdate
+                ? studentID 
+                : (int?)null;
+
             // Check for duplicate email (skip during update if it's the same student)
-            string? excludeId = isUpdate && !string.IsNullOrWhiteSpace(txtStudentID.Text) && txtStudentID.Text != "2025-00126-SM-0"
-                ? txtStudentID.Text
-                : (string?)null;
 
-
-            if (await IsEmailDuplicate(email, excludeId))
+            if (await IsEmailDuplicate(email, excemptedId))
             {
                 MessageBox.Show($"Email '{email}' is already used by another student!\n\nPlease use a different email address.",
                     "Duplicate Email", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -765,12 +783,11 @@ namespace IM_Student_Record
                 return false;
             }
 
-            // Check for duplicate phone number
-            string? excludeId = isUpdate && !string.IsNullOrWhiteSpace(txtStudentID.Text) && txtStudentID.Text != "2025-00126-SM-0"
-            ? txtStudentID.Text
-            : null;
+            int? excemptedId = isUpdate
+            ? studentID
+            : (int?)null;
 
-            if (await IsPhoneDuplicate(mtbPhone.Text.Trim(), excludeId))
+            if (await IsPhoneDuplicate(mtbPhone.Text.Trim(), excemptedId))
             {
                 MessageBox.Show($"Phone number '{mtbPhone.Text}' is already used by another student!\n\nPlease use a different phone number.",
                     "Duplicate Phone Number", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -801,15 +818,14 @@ namespace IM_Student_Record
 
         private void ClearForm()
         {
-            // Reset textboxes to placeholders
-            txtStudentID.Text = "2025-00126-SM-0";
-            txtStudentID.ForeColor = Color.Gray;
-
-            txtFullName.Text = "Dela Cruz, Juan M.";
-            txtFullName.ForeColor = Color.Gray;
-
-            txtEmail.Text = "juandelacruz@iskolarngbayan.pup.edu.ph";
-            txtEmail.ForeColor = Color.Gray;
+            // Clear info
+            studentID = null;
+            txtStudentID.Text = "";
+            txtStudentID.BackColor = Color.White;
+            txtFullName.Text = "";
+            txtFullName.BackColor = Color.White;
+            txtEmail.Text = "";
+            txtEmail.BackColor = Color.White;
 
             // Clear phone
             mtbPhone.Text = "";
@@ -819,11 +835,6 @@ namespace IM_Student_Record
             cmbCourse.SelectedIndex = 0;    // "-- Select Course --"
             cmbYear.SelectedIndex = 0;      // "-- Select Year --"
             cmbSection.SelectedIndex = 0;   // "-- Select Section --" (NEW)
-
-            // Hide "Others" textbox
-            txtOthers.Visible = false;
-            txtOthers.Text = "";
-            lblOthers.Visible = false;
 
             // Reset DatePicker
             dtpDOB.Value = DateTime.Now.AddYears(-18);
@@ -851,12 +862,10 @@ namespace IM_Student_Record
         // ADD BUTTON 
         private async void btnAdd_Click(object sender, EventArgs e)
         {
-            // Only here we show error messages
-            if (!await ValidateAllFields(isUpdate: false))
+            if (MessageBox.Show("Are you sure you want to add this student?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
             {
-                return;  // Validation failed with message box
+                return;
             }
-
             if (!await ValidateAllFields(isUpdate: false))
             {
                 return;
@@ -869,11 +878,11 @@ namespace IM_Student_Record
                     await conn.OpenAsync();
 
                     // Check for duplicate student ID
-                    string checkIdQuery = "SELECT COUNT(*) FROM students WHERE student_id = @id";
+                    string checkIdQuery = "SELECT COUNT(*) FROM students WHERE student_number = @sn";
                     using (MySqlCommand checkCmd = new MySqlCommand(checkIdQuery, conn))
                     {
                         string studentIdNumber = txtStudentID.Text.Trim();
-                        checkCmd.Parameters.AddWithValue("@id", studentIdNumber);
+                        checkCmd.Parameters.AddWithValue("@sn", studentIdNumber);
 
                         object result = await checkCmd.ExecuteScalarAsync();
                         int count = Convert.ToInt32(result);
@@ -902,12 +911,14 @@ namespace IM_Student_Record
                         }
                     }
 
-                    string insertQuery = "INSERT INTO students (student_id, full_name, date_of_birth, gender, course, year_level, section, email, phone) " +
-                                         "VALUES (@id, @name, @dob, @gender, @course, @year, @section, @email, @phone)";
+
+
+                    string insertQuery = "INSERT INTO students (student_number, full_name, date_of_birth, gender, course, year_level, section, email, phone) " +
+                                         "VALUES (@sn, @name, @dob, @gender, @course, @year, @section, @email, @phone)";
 
                     using (MySqlCommand cmd = new MySqlCommand(insertQuery, conn))
                     {
-                        cmd.Parameters.AddWithValue("@id", txtStudentID.Text.Trim());
+                        cmd.Parameters.AddWithValue("@sn", txtStudentID.Text.Trim());
                         cmd.Parameters.AddWithValue("@name", txtFullName.Text.Trim());
                         cmd.Parameters.AddWithValue("@dob", dtpDOB.Value.ToString("yyyy-MM-dd"));
                         cmd.Parameters.AddWithValue("@gender", cmbGender.Text);
@@ -963,6 +974,8 @@ namespace IM_Student_Record
                 return;
             }
 
+            string updatedStudentID = txtStudentID.Text != txtStudentID.Tag?.ToString() ? txtStudentID.Text : txtStudentID.Tag?.ToString();
+
             if (!await ValidateAllFields(isUpdate: true))
             {
                 return;
@@ -973,9 +986,9 @@ namespace IM_Student_Record
 
             if (confirm != DialogResult.Yes) return;
 
-            string query = "UPDATE students SET full_name = @name, date_of_birth = @dob, gender = @gender, " +
+            string query = "UPDATE students SET student_number = @sn, full_name = @name, date_of_birth = @dob, gender = @gender, " +
                            "course = @course, year_level = @year, email = @email, phone = @phone " +
-                           "WHERE student_id = @id";
+                           $"WHERE student_id = @id";
 
             try
             {
@@ -983,7 +996,8 @@ namespace IM_Student_Record
                 {
                     using (MySqlCommand cmd = new MySqlCommand(query, conn))
                     {
-                        cmd.Parameters.AddWithValue("@id", txtStudentID.Text);
+                        cmd.Parameters.AddWithValue("id", studentID);
+                        cmd.Parameters.AddWithValue("sn", updatedStudentID);
                         cmd.Parameters.AddWithValue("@name", txtFullName.Text.Trim());
                         cmd.Parameters.AddWithValue("@dob", dtpDOB.Value.ToString("yyyy-MM-dd"));
                         cmd.Parameters.AddWithValue("@gender", cmbGender.Text);
@@ -1020,12 +1034,18 @@ namespace IM_Student_Record
         // DELETE BUTTON 
         private async void btnDelete_Click(object sender, EventArgs e)
         {
-            if (txtStudentID.Text == "2025-00126-SM-0" || string.IsNullOrWhiteSpace(txtStudentID.Text))
+            if (dgvStudents.SelectedRows.Count <= 0)
             {
-                MessageBox.Show("Please select a record to delete from the table.",
-                    "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("You need to select the student to delete", "Notice", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
+
+            //if (txtStudentID.Text == "2025-00126-SM-0" || string.IsNullOrWhiteSpace(txtStudentID.Text))
+            //{
+            //    MessageBox.Show("Please select a record to delete from the table.",
+            //        "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            //    return;
+            //}
 
             DialogResult result = MessageBox.Show($"Are you sure you want to delete Student ID: {txtStudentID.Text}?\n\nThis action cannot be undone!",
                                                   "Confirm Deletion", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
@@ -1080,12 +1100,14 @@ namespace IM_Student_Record
         // DATA GRID VIEW SELECTION
         private void dgvStudents_SelectionChanged(object sender, EventArgs e)
         {
+            ClearForm();
             if (dgvStudents.SelectedRows.Count > 0)
             {
                 DataGridViewRow row = dgvStudents.SelectedRows[0];
 
-                string studentIdNumber = Convert.ToString(row.Cells["Student ID"].Value);
-                txtStudentID.Text = studentIdNumber; //ConvertNumberToPUP(studentIdNumber); Not needed anymore
+                studentID = (int)row.Cells["student_id"].Value;
+                string studentIdNumber = Convert.ToString(row.Cells["Student Number"].Value);
+                txtStudentID.Text = studentIdNumber;
 
                 txtFullName.Text = row.Cells["Full Name"].Value.ToString();
                 dtpDOB.Value = Convert.ToDateTime(row.Cells["Date of Birth"].Value);
@@ -1094,14 +1116,6 @@ namespace IM_Student_Record
                 if (cmbGender.Items.Contains(gender))
                 {
                     cmbGender.SelectedItem = gender;
-                    txtOthers.Visible = false;
-                }
-                else
-                {
-                    cmbGender.SelectedItem = "Others";
-                    txtOthers.Text = gender;
-                    txtOthers.Visible = true;
-                    lblOthers.Visible = true;
                 }
 
                 cmbCourse.SelectedItem = row.Cells["Course"].Value.ToString();
@@ -1117,34 +1131,6 @@ namespace IM_Student_Record
         {
             await LoadGridData();
             this.ShowIcon = false;
-        }
-
-        // wait a moment i'll organize this a bit more, it's a bit messy right now
-
-        private void CmbGender_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (cmbGender.SelectedItem?.ToString() == "Others")
-            {
-                txtOthers.Visible = true;
-                lblOthers.Visible = true;
-                txtOthers.Focus();
-            }
-            else
-            {
-                txtOthers.Visible = false;
-                lblOthers.Visible = false;
-                txtOthers.Text = "";
-            }
-        }
-
-        private string GetGenderForDatabase()
-        {
-            string gender = cmbGender.SelectedItem?.ToString();
-            if (gender == "Others" && !string.IsNullOrWhiteSpace(txtOthers.Text))
-            {
-                return txtOthers.Text.Trim();
-            }
-            return gender;
         }
 
         private void frmStudentRec_FormClosing(object sender, FormClosingEventArgs e)
