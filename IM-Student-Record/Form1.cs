@@ -156,7 +156,7 @@ namespace IM_Student_Record
             cmbGender.Items.Add("-- Select Gender --");
             cmbGender.Items.Add("Male");
             cmbGender.Items.Add("Female");
-            cmbGender.Items.Add("Others");
+            cmbGender.Items.Add("Non-Binary");
             cmbGender.SelectedIndex = 0;
             cmbGender.DropDownStyle = ComboBoxStyle.DropDownList;
 
@@ -369,6 +369,15 @@ namespace IM_Student_Record
 
                             // Clear any selection after loading data
                             ClearSelection();
+
+                            //Makes columns not take too much space
+                            dgvStudents.Columns["Email"].FillWeight = 150;
+                            dgvStudents.Columns["Full Name"].FillWeight = 150;
+                            dgvStudents.Columns["Course"].FillWeight = 200;
+
+                            dgvStudents.Columns["Year"].FillWeight = 40;
+                            dgvStudents.Columns["Section"].FillWeight = 50;
+                            dgvStudents.Columns["Gender"].FillWeight = 60;
                             dgvStudents.SelectionChanged += dgvStudents_SelectionChanged;
                         }
                     }

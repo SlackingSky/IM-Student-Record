@@ -61,42 +61,42 @@
             // txtStudentID
             // 
             txtStudentID.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            txtStudentID.Font = new Font("Segoe UI", 12F);
-            txtStudentID.Location = new Point(109, 10);
+            txtStudentID.Font = new Font("Segoe UI", 11.25F);
+            txtStudentID.Location = new Point(158, 11);
             txtStudentID.MaxLength = 15;
             txtStudentID.Name = "txtStudentID";
-            txtStudentID.Size = new Size(389, 29);
+            txtStudentID.Size = new Size(391, 27);
             txtStudentID.TabIndex = 1;
             // 
             // txtFullName
             // 
             txtFullName.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            txtFullName.Font = new Font("Segoe UI", 12F);
-            txtFullName.Location = new Point(109, 60);
+            txtFullName.Font = new Font("Segoe UI", 11.25F);
+            txtFullName.Location = new Point(158, 61);
             txtFullName.MaxLength = 100;
             txtFullName.Name = "txtFullName";
-            txtFullName.Size = new Size(389, 29);
+            txtFullName.Size = new Size(391, 27);
             txtFullName.TabIndex = 3;
             // 
             // dtpDOB
             // 
             dtpDOB.Anchor = AnchorStyles.Left;
-            dtpDOB.Font = new Font("Segoe UI", 12F);
+            dtpDOB.Font = new Font("Segoe UI", 11.25F);
             dtpDOB.Format = DateTimePickerFormat.Short;
-            dtpDOB.Location = new Point(109, 110);
+            dtpDOB.Location = new Point(158, 111);
             dtpDOB.Name = "dtpDOB";
-            dtpDOB.Size = new Size(169, 29);
+            dtpDOB.Size = new Size(169, 27);
             dtpDOB.TabIndex = 6;
             // 
             // cmbGender
             // 
             cmbGender.Anchor = AnchorStyles.Left;
             cmbGender.DropDownStyle = ComboBoxStyle.DropDownList;
-            cmbGender.Font = new Font("Segoe UI", 12F);
+            cmbGender.Font = new Font("Segoe UI", 11.25F);
             cmbGender.Items.AddRange(new object[] { "Male", "Female", "Non-binary" });
-            cmbGender.Location = new Point(109, 160);
+            cmbGender.Location = new Point(158, 161);
             cmbGender.Name = "cmbGender";
-            cmbGender.Size = new Size(168, 29);
+            cmbGender.Size = new Size(168, 28);
             cmbGender.TabIndex = 4;
             // 
             // cmbCourse
@@ -104,11 +104,11 @@
             cmbCourse.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             tableLayoutPanel1.SetColumnSpan(cmbCourse, 3);
             cmbCourse.DropDownStyle = ComboBoxStyle.DropDownList;
-            cmbCourse.Font = new Font("Segoe UI", 12F);
+            cmbCourse.Font = new Font("Segoe UI", 11.25F);
             cmbCourse.Items.AddRange(new object[] { "Bachelor of Science in Accountancy", "Bachelor of Science in Computer Engineering", "Bachelor of Science in Entrepreneurship", "Bachelor of Science in Hospitality Management", "Bachelor of Science in Information Technology", "Bachelor of Secondary Education major in English", "Bachelor of Secondary Education major in Mathematics", "Diploma in Office Management Technology with Specialization in Legal Office Management " });
-            cmbCourse.Location = new Point(586, 10);
+            cmbCourse.Location = new Point(677, 11);
             cmbCourse.Name = "cmbCourse";
-            cmbCourse.Size = new Size(413, 29);
+            cmbCourse.Size = new Size(434, 28);
             cmbCourse.TabIndex = 2;
             // 
             // cmbYear
@@ -118,10 +118,10 @@
             cmbYear.Font = new Font("Segoe UI", 9.75F);
             cmbYear.ItemHeight = 17;
             cmbYear.Items.AddRange(new object[] { "1", "2", "3", "4" });
-            cmbYear.Location = new Point(586, 62);
+            cmbYear.Location = new Point(677, 62);
             cmbYear.MaxLength = 1;
             cmbYear.Name = "cmbYear";
-            cmbYear.Size = new Size(148, 25);
+            cmbYear.Size = new Size(149, 25);
             cmbYear.TabIndex = 5;
             // 
             // txtEmail
@@ -129,10 +129,10 @@
             txtEmail.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             tableLayoutPanel1.SetColumnSpan(txtEmail, 3);
             txtEmail.Font = new Font("Segoe UI", 9.75F);
-            txtEmail.Location = new Point(586, 112);
+            txtEmail.Location = new Point(677, 112);
             txtEmail.MaxLength = 100;
             txtEmail.Name = "txtEmail";
-            txtEmail.Size = new Size(413, 25);
+            txtEmail.Size = new Size(434, 25);
             txtEmail.TabIndex = 7;
             // 
             // dgvStudents
@@ -157,14 +157,14 @@
             dgvStudents.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             dgvStudents.ColumnHeadersHeight = 40;
             dgvStudents.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = Color.White;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle2.BackColor = SystemColors.GradientInactiveCaption;
             dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F);
             dataGridViewCellStyle2.ForeColor = SystemColors.ControlText;
             dataGridViewCellStyle2.Padding = new Padding(5);
             dataGridViewCellStyle2.SelectionBackColor = Color.LightSteelBlue;
             dataGridViewCellStyle2.SelectionForeColor = Color.Black;
-            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.False;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
             dgvStudents.DefaultCellStyle = dataGridViewCellStyle2;
             dgvStudents.EnableHeadersVisualStyles = false;
             dgvStudents.GridColor = Color.Gainsboro;
@@ -175,11 +175,13 @@
             dgvStudents.ReadOnly = true;
             dgvStudents.RowHeadersVisible = false;
             dgvStudents.RowHeadersWidth = 51;
+            dgvStudents.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
             dgvStudents.RowsDefaultCellStyle = dataGridViewCellStyle3;
             dgvStudents.RowTemplate.Height = 35;
             dgvStudents.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvStudents.Size = new Size(1016, 237);
+            dgvStudents.Size = new Size(1128, 237);
             dgvStudents.TabIndex = 9;
             dgvStudents.SelectionChanged += dgvStudents_SelectionChanged;
             // 
@@ -190,7 +192,7 @@
             btnAdd.Font = new Font("Segoe UI", 7.68000031F, FontStyle.Bold, GraphicsUnit.Point, 0);
             btnAdd.ForeColor = Color.White;
             btnAdd.Image = Properties.Resources.plus_8_16;
-            btnAdd.Location = new Point(800, 6);
+            btnAdd.Location = new Point(912, 6);
             btnAdd.Name = "btnAdd";
             btnAdd.Size = new Size(218, 35);
             btnAdd.TabIndex = 10;
@@ -307,7 +309,7 @@
             lblCourse.AutoSize = true;
             lblCourse.Font = new Font("Segoe UI", 12F);
             lblCourse.ForeColor = Color.SteelBlue;
-            lblCourse.Location = new Point(504, 14);
+            lblCourse.Location = new Point(555, 14);
             lblCourse.Name = "lblCourse";
             lblCourse.Size = new Size(62, 21);
             lblCourse.TabIndex = 17;
@@ -319,9 +321,9 @@
             lblYear.AutoSize = true;
             lblYear.Font = new Font("Segoe UI", 12F);
             lblYear.ForeColor = Color.SteelBlue;
-            lblYear.Location = new Point(504, 54);
+            lblYear.Location = new Point(555, 64);
             lblYear.Name = "lblYear";
-            lblYear.Size = new Size(49, 42);
+            lblYear.Size = new Size(83, 21);
             lblYear.TabIndex = 16;
             lblYear.Text = "Year Level:";
             // 
@@ -331,7 +333,7 @@
             lblEmail.AutoSize = true;
             lblEmail.Font = new Font("Segoe UI", 12F);
             lblEmail.ForeColor = Color.SteelBlue;
-            lblEmail.Location = new Point(504, 114);
+            lblEmail.Location = new Point(555, 114);
             lblEmail.Name = "lblEmail";
             lblEmail.Size = new Size(51, 21);
             lblEmail.TabIndex = 15;
@@ -343,7 +345,7 @@
             lblPhone.AutoSize = true;
             lblPhone.Font = new Font("Segoe UI", 12F);
             lblPhone.ForeColor = Color.SteelBlue;
-            lblPhone.Location = new Point(504, 164);
+            lblPhone.Location = new Point(555, 164);
             lblPhone.Name = "lblPhone";
             lblPhone.Size = new Size(57, 21);
             lblPhone.TabIndex = 14;
@@ -353,12 +355,12 @@
             // 
             mtbPhone.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             tableLayoutPanel1.SetColumnSpan(mtbPhone, 3);
-            mtbPhone.Font = new Font("Segoe UI", 12F);
-            mtbPhone.Location = new Point(586, 160);
+            mtbPhone.Font = new Font("Segoe UI", 11.25F);
+            mtbPhone.Location = new Point(677, 161);
             mtbPhone.Mask = "(+63)000-000-0000";
             mtbPhone.Name = "mtbPhone";
             mtbPhone.PromptChar = ' ';
-            mtbPhone.Size = new Size(413, 29);
+            mtbPhone.Size = new Size(434, 27);
             mtbPhone.TabIndex = 22;
             // 
             // pbSRS
@@ -395,13 +397,13 @@
             panel1.ForeColor = Color.SteelBlue;
             panel1.Location = new Point(12, 105);
             panel1.Name = "panel1";
-            panel1.Size = new Size(1020, 251);
+            panel1.Size = new Size(1132, 251);
             panel1.TabIndex = 26;
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Font = new Font("Segoe UI", 9.120001F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label1.Font = new Font("Segoe UI", 9.120002F, FontStyle.Bold, GraphicsUnit.Point, 0);
             label1.ForeColor = Color.SteelBlue;
             label1.Location = new Point(12, 10);
             label1.Name = "label1";
@@ -413,12 +415,12 @@
             // 
             tableLayoutPanel1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             tableLayoutPanel1.ColumnCount = 6;
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10.5788422F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 39.4211578F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 8.183633F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 15.3692617F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 7.0858283F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 19.3612766F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 13.9041634F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 35.6637878F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10.9976435F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 13.9041634F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 8.562451F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 16.8892384F));
             tableLayoutPanel1.Controls.Add(cmbSection, 5, 1);
             tableLayoutPanel1.Controls.Add(lblStudentID, 0, 0);
             tableLayoutPanel1.Controls.Add(mtbPhone, 3, 3);
@@ -444,7 +446,7 @@
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
-            tableLayoutPanel1.Size = new Size(1002, 200);
+            tableLayoutPanel1.Size = new Size(1114, 200);
             tableLayoutPanel1.TabIndex = 30;
             // 
             // cmbSection
@@ -454,10 +456,10 @@
             cmbSection.Font = new Font("Segoe UI", 9.75F);
             cmbSection.IntegralHeight = false;
             cmbSection.Items.AddRange(new object[] { "1", "2", "3", "4" });
-            cmbSection.Location = new Point(811, 62);
+            cmbSection.Location = new Point(927, 62);
             cmbSection.MaxLength = 1;
             cmbSection.Name = "cmbSection";
-            cmbSection.Size = new Size(188, 25);
+            cmbSection.Size = new Size(184, 25);
             cmbSection.TabIndex = 28;
             // 
             // lblSection
@@ -466,7 +468,7 @@
             lblSection.AutoSize = true;
             lblSection.Font = new Font("Segoe UI", 12F);
             lblSection.ForeColor = Color.SteelBlue;
-            lblSection.Location = new Point(740, 64);
+            lblSection.Location = new Point(832, 64);
             lblSection.Name = "lblSection";
             lblSection.Size = new Size(64, 21);
             lblSection.TabIndex = 29;
@@ -492,7 +494,7 @@
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle());
             tableLayoutPanel2.Controls.Add(btnUpdate, 0, 0);
             tableLayoutPanel2.Controls.Add(btnRefresh, 1, 0);
-            tableLayoutPanel2.Location = new Point(694, 364);
+            tableLayoutPanel2.Location = new Point(806, 364);
             tableLayoutPanel2.Name = "tableLayoutPanel2";
             tableLayoutPanel2.RowCount = 1;
             tableLayoutPanel2.RowStyles.Add(new RowStyle());
@@ -504,7 +506,7 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.AliceBlue;
-            ClientSize = new Size(1038, 652);
+            ClientSize = new Size(1153, 664);
             Controls.Add(tableLayoutPanel2);
             Controls.Add(label2);
             Controls.Add(panel1);
@@ -513,7 +515,7 @@
             Controls.Add(btnDelete);
             Controls.Add(dgvStudents);
             Icon = (Icon)resources.GetObject("$this.Icon");
-            MinimumSize = new Size(1054, 691);
+            MinimumSize = new Size(1169, 703);
             Name = "frmStudentRec";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Student Record System";
