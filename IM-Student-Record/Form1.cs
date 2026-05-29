@@ -298,13 +298,13 @@ namespace IM_Student_Record
         }
 
         // ========== CHECK DUPLICATES (Email and Phone) ==========
-        private bool IsEmailDuplicate(string email, string? excludeStudentId = null)
+        private async Task<bool> IsEmailDuplicate(string email, string? excludeStudentId = null)
         {
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(connString))
                 {
-                    conn.Open();
+                    await conn.OpenAsync();
                     string query = "SELECT COUNT(*) FROM students WHERE email = @email";
                     if (excludeStudentId != null)
                     {
@@ -319,7 +319,8 @@ namespace IM_Student_Record
                             cmd.Parameters.AddWithValue("@studentId", excludeStudentId);
                         }
 
-                        int count = Convert.ToInt32(cmd.ExecuteScalar());
+                        object? result = await cmd.ExecuteScalarAsync();
+                        int count = Convert.ToInt32(result);
                         return count > 0;
                     }
                 }
@@ -330,13 +331,13 @@ namespace IM_Student_Record
             }
         }
 
-        private bool IsPhoneDuplicate(string phone, string? excludeStudentId = null)
+        private async Task<bool> IsPhoneDuplicate(string phone, string? excludeStudentId = null)
         {
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(connString))
                 {
-                    conn.Open();
+                    await conn.OpenAsync();
                     string query = "SELECT COUNT(*) FROM students WHERE phone = @phone";
                     if (excludeStudentId != null)
                     {
@@ -351,7 +352,8 @@ namespace IM_Student_Record
                             cmd.Parameters.AddWithValue("@studentId", excludeStudentId);
                         }
 
-                        int count = Convert.ToInt32(cmd.ExecuteScalar());
+                        object? result = await cmd.ExecuteScalarAsync();
+                        int count = Convert.ToInt32(result);
                         return count > 0;
                     }
                 }
@@ -363,27 +365,30 @@ namespace IM_Student_Record
         }
 
         // ========== LOAD GRID DATA ==========
-        private void LoadGridData()
+        private async Task LoadGridData()
         {
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(connString))
                 {
-                    conn.Open();
+                    await conn.OpenAsync();
                     // updated the query to include section
                     string query = "SELECT student_id AS 'Student ID', full_name AS 'Full Name', " +
                                    "date_of_birth AS 'Date of Birth', gender AS 'Gender', " +
                                    "course AS 'Course', year_level AS 'Year', section AS 'Section', " +  // ADD THIS
                                    "email AS 'Email', phone AS 'Phone' FROM students ORDER BY student_id";
 
-                    using (MySqlDataAdapter adapter = new MySqlDataAdapter(query, conn))
+                    using (MySqlCommand cmd = new MySqlCommand(query, conn))
                     {
-                        DataTable dt = new DataTable();
-                        adapter.Fill(dt);
-                        dgvStudents.DataSource = dt;
+                        using (var reader = await cmd.ExecuteReaderAsync())
+                        {
+                            DataTable dt = new DataTable();
+                            dt.Load(reader);
+                            dgvStudents.DataSource = dt;
 
-                        // Clear any selection after loading data
-                        ClearSelection();
+                            // Clear any selection after loading data
+                            ClearSelection();
+                        }
                     }
                 }
             }
@@ -680,7 +685,7 @@ namespace IM_Student_Record
         }
 
         // EMAIL VALIDATION (with duplicate check) 
-        private bool ValidateEmail(bool isUpdate = false)
+        private async Task<bool> ValidateEmail(bool isUpdate = false)
         {
             // Skip if placeholder is showing
             if (txtEmail.Text == "juandelacruz@iskolarngbayan.pup.edu.ph" || string.IsNullOrWhiteSpace(txtEmail.Text))
@@ -715,9 +720,10 @@ namespace IM_Student_Record
             // Check for duplicate email (skip during update if it's the same student)
             string? excludeId = isUpdate && !string.IsNullOrWhiteSpace(txtStudentID.Text) && txtStudentID.Text != "2025-00126-SM-0"
                 ? txtStudentID.Text
-                : null;
+                : (string?)null;
 
-            if (IsEmailDuplicate(email, excludeId))
+
+            if (await IsEmailDuplicate(email, excludeId))
             {
                 MessageBox.Show($"Email '{email}' is already used by another student!\n\nPlease use a different email address.",
                     "Duplicate Email", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -730,7 +736,7 @@ namespace IM_Student_Record
         }
 
         // PHONE VALIDATION (with duplicate check) 
-        private bool ValidatePhone(bool isUpdate = false)
+        private async Task<bool> ValidatePhone(bool isUpdate = false)
         {
             if (string.IsNullOrWhiteSpace(mtbPhone.Text))
             {
@@ -764,7 +770,7 @@ namespace IM_Student_Record
             ? txtStudentID.Text
             : null;
 
-            if (IsPhoneDuplicate(mtbPhone.Text.Trim(), excludeId))
+            if (await IsPhoneDuplicate(mtbPhone.Text.Trim(), excludeId))
             {
                 MessageBox.Show($"Phone number '{mtbPhone.Text}' is already used by another student!\n\nPlease use a different phone number.",
                     "Duplicate Phone Number", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -776,7 +782,7 @@ namespace IM_Student_Record
             return true;
         }
 
-        private bool ValidateAllFields(bool isUpdate = false)
+        private async Task<bool> ValidateAllFields(bool isUpdate = false)
         {
             if (!ValidateStudentID()) return false;
             if (!ValidateFullName()) return false;
@@ -785,8 +791,8 @@ namespace IM_Student_Record
             if (!ValidateCourse()) return false;
             if (!ValidateYearLevel()) return false;
             if (!ValidateSection()) return false;
-            if (!ValidateEmail(isUpdate)) return false;
-            if (!ValidatePhone(isUpdate)) return false;
+            if (!await ValidateEmail(isUpdate)) return false;
+            if (!await ValidatePhone(isUpdate)) return false;
 
             return true;
         }
@@ -843,15 +849,15 @@ namespace IM_Student_Record
 
         // ================== CRUD OPERATIONS ==================
         // ADD BUTTON 
-        private void btnAdd_Click(object sender, EventArgs e)
+        private async void btnAdd_Click(object sender, EventArgs e)
         {
             // Only here we show error messages
-            if (!ValidateAllFields(isUpdate: false))
+            if (!await ValidateAllFields(isUpdate: false))
             {
                 return;  // Validation failed with message box
             }
 
-            if (!ValidateAllFields(isUpdate: false))
+            if (!await ValidateAllFields(isUpdate: false))
             {
                 return;
             }
@@ -860,7 +866,7 @@ namespace IM_Student_Record
             {
                 using (MySqlConnection conn = new MySqlConnection(connString))
                 {
-                    conn.Open();
+                    await conn.OpenAsync();
 
                     // Check for duplicate student ID
                     string checkIdQuery = "SELECT COUNT(*) FROM students WHERE student_id = @id";
@@ -869,7 +875,8 @@ namespace IM_Student_Record
                         string studentIdNumber = txtStudentID.Text.Trim();
                         checkCmd.Parameters.AddWithValue("@id", studentIdNumber);
 
-                        int count = Convert.ToInt32(checkCmd.ExecuteScalar());
+                        object result = await checkCmd.ExecuteScalarAsync();
+                        int count = Convert.ToInt32(result);
                         if (count > 0)
                         {
                             MessageBox.Show($"Student ID '{txtStudentID.Text}' already exists!",
@@ -885,7 +892,8 @@ namespace IM_Student_Record
                         checkCmd.Parameters.AddWithValue("@checkName", txtFullName.Text.Trim());
                         checkCmd.Parameters.AddWithValue("@checkDob", dtpDOB.Value.ToString("yyyy-MM-dd"));
 
-                        int count = Convert.ToInt32(checkCmd.ExecuteScalar());
+                        object result = await checkCmd.ExecuteScalarAsync();
+                        int count = Convert.ToInt32(result);
                         if (count > 0)
                         {
                             MessageBox.Show("A student with this exact Name and Date of Birth already exists!",
@@ -909,12 +917,12 @@ namespace IM_Student_Record
                         cmd.Parameters.AddWithValue("@email", txtEmail.Text.Trim().ToLower());
                         cmd.Parameters.AddWithValue("@phone", mtbPhone.Text);
 
-                        cmd.ExecuteNonQuery();
+                        await cmd.ExecuteNonQueryAsync();
 
                         MessageBox.Show($"Student record added successfully!\n\nStudent ID: {txtStudentID.Text}",
                             "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                        LoadGridData();
+                        await LoadGridData();
                         ClearForm();
                     }
                 }
@@ -940,13 +948,13 @@ namespace IM_Student_Record
         }
 
         // UPDATE BUTTON
-        private void btnUpdate_Click(object sender, EventArgs e)
+        private async void btnUpdate_Click(object sender, EventArgs e)
         {
             // Only here we show error messages
-            if (!ValidateAllFields(isUpdate: false))
-            {
-                return;  // Validation failed with message box
-            }
+            //if (!ValidateAllFields(isUpdate: false))
+            //{
+            //    return;  // Validation failed with message box
+            //}
 
             if (txtStudentID.Text == "2025-00126-SM-0" || string.IsNullOrWhiteSpace(txtStudentID.Text))
             {
@@ -955,7 +963,7 @@ namespace IM_Student_Record
                 return;
             }
 
-            if (!ValidateAllFields(isUpdate: true))
+            if (!await ValidateAllFields(isUpdate: true))
             {
                 return;
             }
@@ -984,14 +992,14 @@ namespace IM_Student_Record
                         cmd.Parameters.AddWithValue("@email", txtEmail.Text.Trim().ToLower());
                         cmd.Parameters.AddWithValue("@phone", mtbPhone.Text);
 
-                        conn.Open();
-                        int rowsAffected = cmd.ExecuteNonQuery();
+                        await conn.OpenAsync();
+                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
 
                         if (rowsAffected > 0)
                         {
                             MessageBox.Show("Student record updated successfully!", "Success",
                                 MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            LoadGridData();
+                            await LoadGridData();
                             ClearForm();
                         }
                         else
@@ -1010,7 +1018,7 @@ namespace IM_Student_Record
         }
 
         // DELETE BUTTON 
-        private void btnDelete_Click(object sender, EventArgs e)
+        private async void btnDelete_Click(object sender, EventArgs e)
         {
             if (txtStudentID.Text == "2025-00126-SM-0" || string.IsNullOrWhiteSpace(txtStudentID.Text))
             {
@@ -1034,14 +1042,14 @@ namespace IM_Student_Record
                         {
                             cmd.Parameters.AddWithValue("@id", txtStudentID.Text);
 
-                            conn.Open();
-                            int rowsAffected = cmd.ExecuteNonQuery();
+                            await conn.OpenAsync();
+                            int rowsAffected = await cmd.ExecuteNonQueryAsync();
 
                             if (rowsAffected > 0)
                             {
                                 MessageBox.Show("Student record deleted successfully.", "Deleted",
                                     MessageBoxButtons.OK, MessageBoxIcon.Information);
-                                LoadGridData();
+                                await LoadGridData();
                                 ClearForm();
                             }
                             else
@@ -1061,9 +1069,9 @@ namespace IM_Student_Record
         }
 
         // REFRESH BUTTON
-        private void btnRefresh_Click(object sender, EventArgs e)
+        private async void btnRefresh_Click(object sender, EventArgs e)
         {
-            LoadGridData();
+            await LoadGridData();
             ClearForm();
         }
 
@@ -1105,10 +1113,10 @@ namespace IM_Student_Record
         }
 
         // FORM LOAD 
-        private void frmStudentRec_Load(object sender, EventArgs e)
+        private async void frmStudentRec_Load(object sender, EventArgs e)
         {
-            LoadGridData();
-            this.ShowIcon = false;       // Hides form icon mwehehehe
+            await LoadGridData();
+            this.ShowIcon = false;
         }
 
         // wait a moment i'll organize this a bit more, it's a bit messy right now
@@ -1139,5 +1147,15 @@ namespace IM_Student_Record
             return gender;
         }
 
+        private void frmStudentRec_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                if (MessageBox.Show("Are you sure you want to exit?", "Exit Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+                {
+                    e.Cancel = true;
+                }
+            }
+        }
     }
 }
