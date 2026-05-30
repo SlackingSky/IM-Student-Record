@@ -784,8 +784,6 @@ namespace IM_Student_Record
 
             if (cleanPhone.Length < 12)
             {
-
-                lblSRS.Text = cleanPhone;
                 MessageBox.Show("Please enter a valid phone number with at least 10 digits!",
                     "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 mtbPhone.Focus();
