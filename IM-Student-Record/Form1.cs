@@ -380,7 +380,7 @@ namespace IM_Student_Record
                 if (!string.IsNullOrWhiteSpace(txtFullName.Text))
                 {
                     string fullName = txtFullName.Text.Trim();
-                    if (!IsNameInValid(fullName))
+                    if (IsNameInValid(fullName))
                     {
                         txtFullName.BackColor = Color.LightPink;  // Highlight invalid
                     }
@@ -771,13 +771,21 @@ namespace IM_Student_Record
                 return false;
             }
 
-           lblSRS.Text = mtbPhone.Text;
-
             // Extract only digits for validation
-            string cleanPhone = mtbPhone.Text.Replace("(", "").Replace(")", "").Replace("-", "").Replace("+", "").Replace(" ", "");
+            string cleanPhone = mtbPhone.Text.Replace("(", "").Replace(")", "").Replace("-", "").Replace("+", "").Replace(" ", "").Replace(" ", "");
 
-            if (cleanPhone.Length < 10)
+            if (cleanPhone[2] != '9')
             {
+                MessageBox.Show("Please enter a valid phone number that starts with 9",
+                    "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                mtbPhone.Focus();
+                return false;
+            }
+
+            if (cleanPhone.Length < 12)
+            {
+
+                lblSRS.Text = cleanPhone;
                 MessageBox.Show("Please enter a valid phone number with at least 10 digits!",
                     "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 mtbPhone.Focus();
@@ -991,6 +999,13 @@ namespace IM_Student_Record
                 return;
             }
 
+            if (!CheckIfUpdated(tableLayoutPanel1))
+            {
+                MessageBox.Show("There are no updates to make",
+                    "Update Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             DialogResult confirm = MessageBox.Show("Are you sure you want to update this record?",
                 "Confirm Update", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
@@ -1118,22 +1133,43 @@ namespace IM_Student_Record
                 studentID = (int)row.Cells["student_id"].Value;
                 string studentIdNumber = Convert.ToString(row.Cells["Student Number"].Value);
                 txtStudentID.Text = studentIdNumber;
+                txtStudentID.Tag = studentIdNumber;
 
-                txtFullName.Text = row.Cells["Full Name"].Value.ToString();
+                string fullName = row.Cells["Full Name"].Value.ToString();
+                txtFullName.Text = fullName; 
+                txtFullName.Tag = fullName;
+
                 dtpDOB.Format = DateTimePickerFormat.Short;
-                dtpDOB.Value = Convert.ToDateTime(row.Cells["Date of Birth"].Value);
+                DateTime date = Convert.ToDateTime(row.Cells["Date of Birth"].Value);
+                dtpDOB.Value = date;
+                dtpDOB.Tag = date;
 
                 string gender = row.Cells["Gender"].Value.ToString();
                 if (cmbGender.Items.Contains(gender))
                 {
                     cmbGender.SelectedItem = gender;
                 }
+                cmbGender.Tag = gender;
 
-                cmbCourse.SelectedItem = row.Cells["Course"].Value.ToString();
-                cmbYear.SelectedItem = row.Cells["Year"].Value.ToString();
-                cmbSection.SelectedItem = row.Cells["Section"].Value.ToString();  // ADD THIS
-                txtEmail.Text = row.Cells["Email"].Value.ToString();
-                mtbPhone.Text = row.Cells["Phone"].Value.ToString();
+                string course = row.Cells["Course"].Value.ToString();
+                cmbCourse.SelectedItem = course; 
+                cmbCourse.Tag = course;
+
+                string year = row.Cells["Year"].Value.ToString();
+                cmbYear.SelectedItem = year; 
+                cmbYear.Tag = year;
+
+                string section = row.Cells["Section"].Value.ToString();  // Added
+                cmbSection.SelectedItem = section;
+                cmbSection.Tag = section;
+
+                string email = row.Cells["Email"].Value.ToString();
+                txtEmail.Text = email; 
+                txtEmail.Tag = email;
+
+                string phone = row.Cells["Phone"].Value.ToString();
+                mtbPhone.Text = phone;
+                mtbPhone.Tag = phone;
             }
         }
 
@@ -1141,9 +1177,27 @@ namespace IM_Student_Record
         private async void frmStudentRec_Load(object sender, EventArgs e)
         {
             dtpDOB.ValueChanged += dtpDOB_ValueChanged;
-            txtStudentID.TextChanged += ClearHiglight;
-            txtFullName.TextChanged += ClearHiglight;
-            txtEmail.TextChanged += ClearHiglight;
+            txtStudentID.Enter += ClearHiglight;
+            txtFullName.Enter += ClearHiglight;
+            txtEmail.Enter += ClearHiglight;
+
+            mtbPhone.KeyDown += (s, e) =>
+            {
+                if (e.KeyCode == Keys.Space)
+                {
+                    e.Handled = true;
+                    e.SuppressKeyPress = true;
+                }
+            };
+
+            mtbPhone.KeyUp += (s, e) => EnforcePhoneCursor();
+
+            mtbPhone.Click += (s, e) => EnforcePhoneCursor();
+
+            mtbPhone.Enter += (s, e) => this.BeginInvoke(new Action(EnforcePhoneCursor));
+
+            mtbPhone.Click += (s, e) => MoveMaskedCursorToStart(mtbPhone);
+            mtbPhone.Enter += (s, e) => MoveMaskedCursorToStart(mtbPhone);
 
             await LoadGridData();
             this.ShowIcon = false;
@@ -1191,6 +1245,65 @@ namespace IM_Student_Record
             if (dtpDOB.Format == DateTimePickerFormat.Custom)
             {
                 dtpDOB.Format = DateTimePickerFormat.Short;
+            }
+        }
+
+        private bool CheckIfUpdated(TableLayoutPanel tableLayoutPanel)
+        {
+            foreach (Control c in tableLayoutPanel.Controls)
+            {
+                if (c is TextBox || c is ComboBox || c is MaskedTextBox)
+                {
+                    string originalValue = c.Tag?.ToString() ?? "";
+
+                    if (c.Text != originalValue)
+                    {
+                        return true;
+                    }
+                }
+                else if (c is DateTimePicker dtp)
+                {
+                    if (dtp.Tag != null && DateTime.TryParse(dtp.Tag.ToString(), out DateTime originalDate))
+                    {
+                        if (dtp.Value.Date != originalDate.Date)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        private void MoveMaskedCursorToStart(MaskedTextBox mtb)
+        {
+            this.BeginInvoke(new Action(() =>
+            {
+                if (mtb.MaskedTextProvider != null && mtb.MaskedTextProvider.AssignedEditPositionCount == 0)
+                {
+                    int firstEditIndex = mtb.MaskedTextProvider.FindEditPositionFrom(0, true);
+                    if (firstEditIndex != -1)
+                    {
+                        mtb.SelectionStart = firstEditIndex;
+                    }
+                    else
+                    {
+                        mtb.SelectionStart = 0;
+                    }
+                }
+            }));
+        }
+
+        private void EnforcePhoneCursor()
+        {
+            int startIndex = mtbPhone.Mask.IndexOf('0');
+            if (startIndex == -1) startIndex = 0;
+
+            if (mtbPhone.SelectionLength > 0) return;
+
+            if (mtbPhone.SelectionStart < startIndex)
+            {
+                mtbPhone.SelectionStart = startIndex;
             }
         }
     }
