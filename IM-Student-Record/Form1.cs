@@ -121,32 +121,12 @@ namespace IM_Student_Record
             // Set placeholder
             txtEmail.Tag = placeholderText;
             txtEmail.Text = placeholderText;
-            txtEmail.ForeColor = Color.Gray;
 
             // Add tooltip
             toolTip1.SetToolTip(txtEmail, tooltipText);
             toolTip1.ToolTipTitle = "Email Format";
             toolTip1.ToolTipIcon = ToolTipIcon.Info;
             toolTip1.IsBalloon = true;  // Optional: balloon style
-
-            // Placeholder behavior
-            txtEmail.Enter += (s, e) =>
-            {
-                if (txtEmail.Text == placeholderText)
-                {
-                    txtEmail.Text = "";
-                    txtEmail.ForeColor = Color.Black;
-                }
-            };
-
-            txtEmail.Leave += (s, e) =>
-            {
-                if (string.IsNullOrWhiteSpace(txtEmail.Text))
-                {
-                    txtEmail.Text = placeholderText;
-                    txtEmail.ForeColor = Color.Gray;
-                }
-            };
         }
 
         private void SetupComboBoxes()
@@ -173,6 +153,7 @@ namespace IM_Student_Record
             cmbCourse.Items.Add("Diploma in Office Management Technology with Specialization in Legal Office Management");
             cmbCourse.SelectedIndex = 0;
             cmbCourse.DropDownStyle = ComboBoxStyle.DropDownList;
+            AdjustComboBoxDropdownWidth(cmbCourse);
 
             // Year Level ComboBox
             cmbYear.Items.Clear();
@@ -396,10 +377,10 @@ namespace IM_Student_Record
             // Real-time visual feedback (no message boxes)
             txtFullName.Leave += (s, e) =>
             {
-                if (!string.IsNullOrWhiteSpace(txtFullName.Text) && txtFullName.Text != "Dela Cruz, Juan M.")
+                if (!string.IsNullOrWhiteSpace(txtFullName.Text))
                 {
                     string fullName = txtFullName.Text.Trim();
-                    if (!fullName.Contains(","))
+                    if (!IsNameInValid(fullName))
                     {
                         txtFullName.BackColor = Color.LightPink;  // Highlight invalid
                     }
@@ -407,10 +388,6 @@ namespace IM_Student_Record
                     {
                         txtFullName.BackColor = Color.White;  // Clear highlight
                     }
-                }
-                else
-                {
-                    txtFullName.BackColor = Color.White;
                 }
             };
 
@@ -442,6 +419,20 @@ namespace IM_Student_Record
                     {
                         var addr = new System.Net.Mail.MailAddress(txtEmail.Text.Trim());
                         if (addr.Address != txtEmail.Text.Trim())
+                        {
+                            txtEmail.BackColor = Color.LightPink;
+                        }
+                        else
+                        {
+                            txtEmail.BackColor = Color.White;
+                        }
+
+                        string email = txtEmail.Text.Trim().ToLower();
+
+                        // Self explanatory naman, checks email pattern, prevents g@com
+                        string emailPattern = @"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$";
+
+                        if (!System.Text.RegularExpressions.Regex.IsMatch(email, emailPattern))
                         {
                             txtEmail.BackColor = Color.LightPink;
                         }
@@ -620,6 +611,14 @@ namespace IM_Student_Record
 
         private bool ValidateDOB()
         {
+            if (dtpDOB.Format == DateTimePickerFormat.Custom)
+            {
+                MessageBox.Show("Please select a Date of Birth!", "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                dtpDOB.Focus();
+                return false;
+            }
+
             DateTime selectedDate = dtpDOB.Value;
             DateTime today = DateTime.Today;
 
@@ -772,6 +771,8 @@ namespace IM_Student_Record
                 return false;
             }
 
+           lblSRS.Text = mtbPhone.Text;
+
             // Extract only digits for validation
             string cleanPhone = mtbPhone.Text.Replace("(", "").Replace(")", "").Replace("-", "").Replace("+", "").Replace(" ", "");
 
@@ -845,7 +846,8 @@ namespace IM_Student_Record
             cmbSection.SelectedIndex = 0;   // "-- Select Section --" (NEW)
 
             // Reset DatePicker
-            dtpDOB.Value = DateTime.Now.AddYears(-18);
+            dtpDOB.Format = DateTimePickerFormat.Custom;
+            dtpDOB.CustomFormat = " 'Select Date' ";
 
             // Remove focus from any control
             this.ActiveControl = null;
@@ -1068,7 +1070,7 @@ namespace IM_Student_Record
                     {
                         using (MySqlCommand cmd = new MySqlCommand(query, conn))
                         {
-                            cmd.Parameters.AddWithValue("@id", txtStudentID.Text);
+                            cmd.Parameters.AddWithValue("@id", studentID);
 
                             await conn.OpenAsync();
                             int rowsAffected = await cmd.ExecuteNonQueryAsync();
@@ -1118,6 +1120,7 @@ namespace IM_Student_Record
                 txtStudentID.Text = studentIdNumber;
 
                 txtFullName.Text = row.Cells["Full Name"].Value.ToString();
+                dtpDOB.Format = DateTimePickerFormat.Short;
                 dtpDOB.Value = Convert.ToDateTime(row.Cells["Date of Birth"].Value);
 
                 string gender = row.Cells["Gender"].Value.ToString();
@@ -1137,6 +1140,11 @@ namespace IM_Student_Record
         // FORM LOAD 
         private async void frmStudentRec_Load(object sender, EventArgs e)
         {
+            dtpDOB.ValueChanged += dtpDOB_ValueChanged;
+            txtStudentID.TextChanged += ClearHiglight;
+            txtFullName.TextChanged += ClearHiglight;
+            txtEmail.TextChanged += ClearHiglight;
+
             await LoadGridData();
             this.ShowIcon = false;
         }
@@ -1149,6 +1157,40 @@ namespace IM_Student_Record
                 {
                     e.Cancel = true;
                 }
+            }
+        }
+
+        private void ClearHiglight(object sender, EventArgs e)
+        {
+            if (sender is TextBox txt)
+            {
+                txt.BackColor = Color.White;
+            }
+        }
+
+        private void AdjustComboBoxDropdownWidth(ComboBox cmb)
+        {
+            // Self Explanatory na naman
+            int maxWidth = cmb.Width;
+
+            foreach (var item in cmb.Items)
+            {
+                int itemWidth = TextRenderer.MeasureText(item.ToString(), cmb.Font).Width;
+                if (itemWidth > maxWidth)
+                {
+                    maxWidth = itemWidth;
+                }
+            }
+
+            cmb.DropDownWidth = maxWidth + SystemInformation.VerticalScrollBarWidth;
+        }
+
+        private void dtpDOB_ValueChanged(object sender, EventArgs e)
+        {
+            // Changes dtp to be normal
+            if (dtpDOB.Format == DateTimePickerFormat.Custom)
+            {
+                dtpDOB.Format = DateTimePickerFormat.Short;
             }
         }
     }

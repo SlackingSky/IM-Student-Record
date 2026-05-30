@@ -63,9 +63,10 @@
             txtStudentID.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             txtStudentID.Font = new Font("Segoe UI", 11.25F);
             txtStudentID.Location = new Point(158, 11);
+            txtStudentID.Margin = new Padding(3, 3, 30, 3);
             txtStudentID.MaxLength = 15;
             txtStudentID.Name = "txtStudentID";
-            txtStudentID.Size = new Size(391, 27);
+            txtStudentID.Size = new Size(369, 27);
             txtStudentID.TabIndex = 1;
             // 
             // txtFullName
@@ -73,9 +74,10 @@
             txtFullName.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             txtFullName.Font = new Font("Segoe UI", 11.25F);
             txtFullName.Location = new Point(158, 61);
+            txtFullName.Margin = new Padding(3, 3, 30, 3);
             txtFullName.MaxLength = 100;
             txtFullName.Name = "txtFullName";
-            txtFullName.Size = new Size(391, 27);
+            txtFullName.Size = new Size(369, 27);
             txtFullName.TabIndex = 3;
             // 
             // dtpDOB
@@ -309,7 +311,7 @@
             lblCourse.AutoSize = true;
             lblCourse.Font = new Font("Segoe UI", 12F);
             lblCourse.ForeColor = Color.SteelBlue;
-            lblCourse.Location = new Point(555, 14);
+            lblCourse.Location = new Point(560, 14);
             lblCourse.Name = "lblCourse";
             lblCourse.Size = new Size(62, 21);
             lblCourse.TabIndex = 17;
@@ -321,7 +323,7 @@
             lblYear.AutoSize = true;
             lblYear.Font = new Font("Segoe UI", 12F);
             lblYear.ForeColor = Color.SteelBlue;
-            lblYear.Location = new Point(555, 64);
+            lblYear.Location = new Point(560, 64);
             lblYear.Name = "lblYear";
             lblYear.Size = new Size(83, 21);
             lblYear.TabIndex = 16;
@@ -333,7 +335,7 @@
             lblEmail.AutoSize = true;
             lblEmail.Font = new Font("Segoe UI", 12F);
             lblEmail.ForeColor = Color.SteelBlue;
-            lblEmail.Location = new Point(555, 114);
+            lblEmail.Location = new Point(560, 114);
             lblEmail.Name = "lblEmail";
             lblEmail.Size = new Size(51, 21);
             lblEmail.TabIndex = 15;
@@ -345,7 +347,7 @@
             lblPhone.AutoSize = true;
             lblPhone.Font = new Font("Segoe UI", 12F);
             lblPhone.ForeColor = Color.SteelBlue;
-            lblPhone.Location = new Point(555, 164);
+            lblPhone.Location = new Point(560, 164);
             lblPhone.Name = "lblPhone";
             lblPhone.Size = new Size(57, 21);
             lblPhone.TabIndex = 14;
@@ -377,11 +379,11 @@
             // 
             lblSRS.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             lblSRS.AutoSize = true;
-            lblSRS.Font = new Font("Segoe UI", 17.28F, FontStyle.Bold);
+            lblSRS.Font = new Font("Segoe UI", 24F, FontStyle.Bold, GraphicsUnit.Point, 0);
             lblSRS.ForeColor = Color.SteelBlue;
-            lblSRS.Location = new Point(89, 12);
+            lblSRS.Location = new Point(94, 12);
             lblSRS.Name = "lblSRS";
-            lblSRS.Size = new Size(276, 32);
+            lblSRS.Size = new Size(365, 45);
             lblSRS.TabIndex = 24;
             lblSRS.Text = "Student Record System";
             // 
@@ -416,8 +418,8 @@
             tableLayoutPanel1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             tableLayoutPanel1.ColumnCount = 6;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 13.9041634F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 35.6637878F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10.9976435F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 36.0861778F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10.5026932F));
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 13.9041634F));
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 8.562451F));
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 16.8892384F));
@@ -478,10 +480,10 @@
             // 
             label2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             label2.AutoSize = true;
-            label2.Font = new Font("Segoe UI Semibold", 7.68000031F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label2.Font = new Font("Segoe UI Semibold", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
             label2.Location = new Point(100, 60);
             label2.Name = "label2";
-            label2.Size = new Size(294, 13);
+            label2.Size = new Size(391, 20);
             label2.TabIndex = 27;
             label2.Text = "Manages student records (Create, Read, Update, Delete)";
             // 
